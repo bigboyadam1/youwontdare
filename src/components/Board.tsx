@@ -1,0 +1,49 @@
+import type { Dare } from '../types'
+import DareCard from './DareCard'
+
+interface Props {
+  dares: Dare[]
+  boardType: 'personal' | 'trip'
+  currentUserId: number | null
+  onHype: (id: number) => void
+  onComplete: (dare: Dare) => void
+  onChicken: (id: number) => void
+  onShare: (dare: Dare) => void
+  onProofClick: (url: string, caption: string) => void
+}
+
+export default function Board({ dares, boardType, currentUserId, onHype, onComplete, onChicken, onShare, onProofClick }: Props) {
+  return (
+    <section>
+      <div className="flex items-center gap-4 mb-6">
+        <h2
+          className="font-[Anton] text-[2.5rem] leading-none"
+          style={{ color: '#f0f0f0' }}
+        >
+          THE BOARD
+        </h2>
+        <span className="font-[Courier_Prime] text-sm text-[#aaa49c]">
+          {dares.length} dare{dares.length !== 1 ? 's' : ''}
+        </span>
+      </div>
+      <div className="border-t-4 border-[#f0f0f0] mb-6" />
+
+      <div className="flex flex-col gap-4">
+        {dares.map((dare, i) => (
+          <DareCard
+            key={dare.id}
+            dare={dare}
+            index={i + 1}
+            isOwner={currentUserId !== null && dare.dared_id === currentUserId}
+            boardType={boardType}
+            onHype={() => onHype(dare.id)}
+            onComplete={() => onComplete(dare)}
+            onChicken={() => onChicken(dare.id)}
+            onShare={() => onShare(dare)}
+            onProofClick={onProofClick}
+          />
+        ))}
+      </div>
+    </section>
+  )
+}

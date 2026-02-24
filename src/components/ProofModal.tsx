@@ -1,0 +1,113 @@
+import { useState, useRef } from 'react'
+import type { Dare } from '../types'
+
+interface Props {
+  dare: Dare
+  onSubmit: (id: number, proofUrl: string, caption: string) => void
+  onClose: () => void
+}
+
+export default function ProofModal({ dare, onSubmit, onClose }: Props) {
+  const [imageData, setImageData] = useState('')
+  const [caption, setCaption] = useState('')
+  const [dragging, setDragging] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  const handleFile = (file: File) => {
+    const reader = new FileReader()
+    reader.onload = () => setImageData(reader.result as string)
+    reader.readAsDataURL(file)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (file) handleFile(file)
+  }
+
+  const handleSubmit = () => {
+    if (!imageData) return
+    onSubmit(dare.id, imageData, caption)
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.85)' }}
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md p-6 border border-[#555048]"
+        style={{ background: '#131313' }}
+        onClick={e => e.stopPropagation()}
+      >
+        <h3 className="font-[Anton] text-2xl text-[#00ff99] mb-1">PROVE IT</h3>
+        <p className="font-[Courier_Prime] text-xs text-[#aaa49c] mb-4">
+          upload your proof photo
+        </p>
+
+        {/* Drop zone */}
+        <div
+          className="border-2 border-dashed p-8 text-center mb-4 cursor-pointer transition-colors"
+          style={{
+            borderColor: dragging ? '#00ff99' : '#555048',
+            background: dragging ? '#1c1c1c' : 'transparent',
+          }}
+          onDragOver={e => { e.preventDefault(); setDragging(true) }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={handleDrop}
+          onClick={() => fileRef.current?.click()}
+        >
+          {imageData ? (
+            <img src={imageData} alt="proof preview" className="max-h-48 mx-auto" />
+          ) : (
+            <p className="font-[Courier_Prime] text-sm text-[#aaa49c]">
+              Drag & drop or tap to upload
+            </p>
+          )}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={e => {
+              const file = e.target.files?.[0]
+              if (file) handleFile(file)
+            }}
+          />
+        </div>
+
+        {/* Caption */}
+        <div className="mb-4">
+          <label className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c] block mb-1">
+            Caption
+          </label>
+          <input
+            className="dare-input font-[Courier_Prime] text-sm"
+            value={caption}
+            onChange={e => setCaption(e.target.value)}
+            placeholder="I actually did it..."
+          />
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            onClick={handleSubmit}
+            disabled={!imageData}
+            className="font-[Anton] text-lg px-6 py-2 border-none cursor-pointer disabled:opacity-40"
+            style={{ background: '#00ff99', color: '#0d0d0d' }}
+          >
+            SUBMIT PROOF
+          </button>
+          <button
+            onClick={onClose}
+            className="font-[Courier_Prime] text-sm text-[#aaa49c] hover:text-[#f0f0f0] cursor-pointer border-none bg-transparent"
+          >
+            cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}

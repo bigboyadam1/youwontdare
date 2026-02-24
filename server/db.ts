@@ -1,0 +1,70 @@
+import Database from 'better-sqlite3';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const db = new Database(path.join(__dirname, 'dares.db'));
+db.pragma('journal_mode = WAL');
+
+// --- Schema ---
+db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    username TEXT NOT NULL UNIQUE,
+    display_name TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS boards (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    owner_id INTEGER NOT NULL REFERENCES users(id),
+    type TEXT NOT NULL CHECK(type IN ('personal', 'trip')),
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    is_public INTEGER DEFAULT 1,
+    invite_code TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS board_members (
+    board_id INTEGER NOT NULL REFERENCES boards(id),
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    role TEXT NOT NULL DEFAULT 'member',
+    joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (board_id, user_id)
+  );
+
+  CREATE TABLE IF NOT EXISTS dares (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    author TEXT NOT NULL,
+    text TEXT NOT NULL,
+    location TEXT,
+    reward TEXT,
+    hypes INTEGER DEFAULT 0,
+    status TEXT DEFAULT 'pending',
+    proof_url TEXT,
+    proof_caption TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    board_id INTEGER REFERENCES boards(id),
+    darer_id INTEGER REFERENCES users(id),
+    dared_id INTEGER REFERENCES users(id)
+  );
+`);
+
+// --- Migration: add columns to existing dares table if missing ---
+const columns = db.prepare("PRAGMA table_info(dares)").all() as { name: string }[];
+const colNames = new Set(columns.map(c => c.name));
+
+if (!colNames.has('board_id')) {
+  db.exec('ALTER TABLE dares ADD COLUMN board_id INTEGER REFERENCES boards(id)');
+}
+if (!colNames.has('darer_id')) {
+  db.exec('ALTER TABLE dares ADD COLUMN darer_id INTEGER REFERENCES users(id)');
+}
+if (!colNames.has('dared_id')) {
+  db.exec('ALTER TABLE dares ADD COLUMN dared_id INTEGER REFERENCES users(id)');
+}
+
+export default db;
