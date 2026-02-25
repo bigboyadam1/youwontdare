@@ -204,9 +204,22 @@ router.get('/mine', requireAuth, (req, res) => {
     JOIN users u ON b.owner_id = u.id
     WHERE bm.user_id = ?
     ORDER BY b.created_at DESC
-  `).all(req.session.userId!);
+  `).all(req.session.userId!) as any[];
 
-  res.json({ boards });
+  const boardsWithMembers = boards.map(board => {
+    if (board.type === 'trip') {
+      const members = db.prepare(`
+        SELECT u.id, u.username, u.display_name
+        FROM board_members bm
+        JOIN users u ON bm.user_id = u.id
+        WHERE bm.board_id = ?
+      `).all(board.id);
+      return { ...board, members };
+    }
+    return board;
+  });
+
+  res.json({ boards: boardsWithMembers });
 });
 
 export default router;

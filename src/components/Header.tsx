@@ -26,10 +26,10 @@ export default function Header() {
             {user ? (
               <>
                 <Link
-                  to={`/board/${user.username}`}
+                  to="/my-boards"
                   className="text-[#aaa49c] hover:text-[#f0f0f0] transition-colors no-underline"
                 >
-                  my board
+                  my boards
                 </Link>
                 <Link
                   to="/create-trip"

@@ -11,6 +11,7 @@ import PersonalBoardPage from './pages/PersonalBoardPage'
 import TripBoardPage from './pages/TripBoardPage'
 import CreateTripPage from './pages/CreateTripPage'
 import ProfilePage from './pages/ProfilePage'
+import MyBoardsPage from './pages/MyBoardsPage'
 
 function App() {
   const { loading } = useAuth()
@@ -33,6 +34,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route path="/my-boards" element={<MyBoardsPage />} />
         <Route path="/board/:username" element={<PersonalBoardPage />} />
         <Route path="/trip/:slug" element={<TripBoardPage />} />
         <Route path="/create-trip" element={<CreateTripPage />} />
