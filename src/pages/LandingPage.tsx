@@ -69,9 +69,9 @@ export default function LandingPage() {
           </p>
         </div>
         <div className="border border-[#555048] p-5" style={{ background: '#131313' }}>
-          <div className="font-[Anton] text-lg text-[#00ff99] mb-2">AI DARES</div>
+          <div className="font-[Anton] text-lg text-[#00ff99] mb-2">PROVE IT</div>
           <p className="font-[Courier_Prime] text-xs text-[#aaa49c]">
-            Can't think of anything. AI can.
+            Upload proof. Get the glory. Or chicken out.
           </p>
         </div>
       </div>

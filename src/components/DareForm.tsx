@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import AIPanel from './AIPanel'
 import MemberPicker from './MemberPicker'
 import type { BoardMember } from '../types'
 import { API } from '../config/api'
@@ -22,7 +21,6 @@ export default function DareForm({ boardId, boardType, currentUserId, members, o
   const [deadline, setDeadline] = useState('')
   const [daredId, setDaredId] = useState<number | null>(defaultDaredId ?? null)
   const [isAnonymous, setIsAnonymous] = useState(false)
-  const [showAI, setShowAI] = useState(false)
 
   useEffect(() => {
     if (defaultDaredId !== undefined && defaultDaredId !== null) {
@@ -50,11 +48,6 @@ export default function DareForm({ boardId, boardType, currentUserId, members, o
     setDaredId(null)
     setIsAnonymous(false)
     onDareCreated()
-  }
-
-  const handleAIDare = (dare: string) => {
-    setText(dare)
-    setShowAI(false)
   }
 
   return (
@@ -172,15 +165,7 @@ export default function DareForm({ boardId, boardType, currentUserId, members, o
       </div>
 
       {/* Bottom bar */}
-      <div className="flex items-center justify-between p-4 border-t border-[#555048]">
-        <button
-          type="button"
-          onClick={() => setShowAI(!showAI)}
-          className="font-[Courier_Prime] text-xs text-[#aaa49c] hover:text-[#ff0055] transition-colors cursor-pointer"
-          style={{ borderBottom: '2px dotted #555048' }}
-        >
-          Need inspiration?
-        </button>
+      <div className="flex items-center justify-end p-4 border-t border-[#555048]">
         <button
           type="submit"
           className="font-[Anton] text-xl px-8 py-2 cursor-pointer border-none"
@@ -193,8 +178,6 @@ export default function DareForm({ boardId, boardType, currentUserId, members, o
           POST IT
         </button>
       </div>
-
-      {showAI && <AIPanel onSelectDare={handleAIDare} />}
     </form>
   )
 }

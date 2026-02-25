@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import Anthropic from '@anthropic-ai/sdk';
 import db from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
 import { supabase } from '../supabase.js';
@@ -297,42 +296,5 @@ router.post('/dares/:id/spice', (req, res) => {
   res.json({ spice_avg: Math.round((spice.avg || 0) * 10) / 10, spice_count: spice.count });
 });
 
-// AI dare generation
-router.post('/generate-dares', async (req, res) => {
-  const { vibe, location } = req.body;
-
-  if (!process.env.ANTHROPIC_API_KEY) {
-    res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' });
-    return;
-  }
-
-  const client = new Anthropic();
-
-  try {
-    const message = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 300,
-      messages: [
-        {
-          role: 'user',
-          content: `Generate exactly 3 dares for a travel/adventure dare app. Each dare should be a single sentence.
-Mix it up — some can be bold and adventurous (e.g. "Trek the Annapurna circuit in Nepal"), some fun and social, some quirky challenges. Not everything needs to be embarrassing — cool, epic, and bucket-list dares are great too.
-${vibe && vibe !== 'anything' ? `Vibe: ${vibe}` : ''}
-${location ? `Location: ${location}` : ''}
-
-Return ONLY a JSON array of 3 strings. No other text. Example: ["DARE 1", "DARE 2", "DARE 3"]`,
-        },
-      ],
-    });
-
-    const text = message.content[0].type === 'text' ? message.content[0].text : '';
-    const dares = JSON.parse(text);
-    res.json({ dares });
-  } catch (err: unknown) {
-    const error = err as Error;
-    console.error('AI generation error:', error.message);
-    res.status(500).json({ error: 'Failed to generate dares' });
-  }
-});
 
 export default router;
