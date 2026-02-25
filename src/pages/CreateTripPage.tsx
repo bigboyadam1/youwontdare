@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { API } from '../config/api'
 
 export default function CreateTripPage() {
   const { user } = useAuth()
@@ -17,7 +18,7 @@ export default function CreateTripPage() {
     setError('')
     setLoading(true)
 
-    const res = await fetch('/api/boards/trip', {
+    const res = await fetch(`${API}/api/boards/trip`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { API } from '../config/api'
 
 interface ProfileData {
   user: { id: number; username: string; display_name: string; created_at: string }
@@ -13,7 +14,7 @@ export default function ProfilePage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    fetch(`/api/profile/${username}`)
+    fetch(`${API}/api/profile/${username}`)
       .then(res => {
         if (!res.ok) throw new Error('User not found')
         return res.json()

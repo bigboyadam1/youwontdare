@@ -128,6 +128,7 @@ router.get('/me', (req, res) => {
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3001/api/auth/google/callback';
+const FRONTEND_URL = process.env.FRONTEND_URL || '';
 
 // GET /api/auth/google — redirect to Google consent screen
 router.get('/google', (_req, res) => {
@@ -153,7 +154,7 @@ router.get('/google/callback', async (req, res) => {
   const { code } = req.query;
 
   if (!code || !GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
-    res.redirect('/login?error=google_failed');
+    res.redirect(`${FRONTEND_URL}/login?error=google_failed`);
     return;
   }
 
@@ -173,7 +174,7 @@ router.get('/google/callback', async (req, res) => {
 
     const tokens = await tokenRes.json() as { access_token?: string };
     if (!tokens.access_token) {
-      res.redirect('/login?error=google_failed');
+      res.redirect(`${FRONTEND_URL}/login?error=google_failed`);
       return;
     }
 
@@ -184,7 +185,7 @@ router.get('/google/callback', async (req, res) => {
     const profile = await profileRes.json() as { id: string; email: string; name: string; picture?: string };
 
     if (!profile.id || !profile.email) {
-      res.redirect('/login?error=google_failed');
+      res.redirect(`${FRONTEND_URL}/login?error=google_failed`);
       return;
     }
 
@@ -194,7 +195,9 @@ router.get('/google/callback', async (req, res) => {
     } | undefined;
 
     if (!user) {
-      user = db.prepare('SELECT * FROM users WHERE email = ?').get(profile.email.toLowerCase()) as typeof user;
+      user = db.prepare('SELECT * FROM users WHERE email = ?').get(profile.email.toLowerCase()) as {
+        id: number; username: string; email: string; display_name: string;
+      } | undefined;
       if (user) {
         // Link Google ID to existing account
         db.prepare('UPDATE users SET google_id = ? WHERE id = ?').run(profile.id, user.id);
@@ -205,7 +208,7 @@ router.get('/google/callback', async (req, res) => {
       // Existing user — set session and redirect
       req.session.userId = user.id;
       req.session.username = user.username;
-      res.redirect('/');
+      res.redirect(`${FRONTEND_URL}/`);
       return;
     }
 
@@ -232,10 +235,10 @@ router.get('/google/callback', async (req, res) => {
     req.session.username = tempUsername;
 
     // Redirect to onboarding to pick a username
-    res.redirect('/onboarding?setup=true');
+    res.redirect(`${FRONTEND_URL}/onboarding?setup=true`);
   } catch (err) {
     console.error('Google OAuth error:', (err as Error).message);
-    res.redirect('/login?error=google_failed');
+    res.redirect(`${FRONTEND_URL}/login?error=google_failed`);
   }
 });
 

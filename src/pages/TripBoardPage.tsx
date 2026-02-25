@@ -13,6 +13,7 @@ import ProofGallery from '../components/ProofGallery'
 import ShareModal from '../components/ShareModal'
 import { toast } from '../components/Toast'
 import { useSoundEffect } from '../hooks/useSoundEffect'
+import { API } from '../config/api'
 
 export default function TripBoardPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -38,7 +39,7 @@ export default function TripBoardPage() {
 
   const fetchBoard = useCallback(async () => {
     try {
-      const res = await fetch(`/api/boards/trip/${slug}`, { credentials: 'include' })
+      const res = await fetch(`${API}/api/boards/trip/${slug}`, { credentials: 'include' })
       if (res.status === 403) {
         setError('private')
         setLoading(false)
@@ -72,7 +73,7 @@ export default function TripBoardPage() {
   useEffect(() => {
     const code = searchParams.get('code')
     if (code && user && !isMember) {
-      fetch(`/api/boards/trip/${slug}/join`, {
+      fetch(`${API}/api/boards/trip/${slug}/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -88,7 +89,7 @@ export default function TripBoardPage() {
 
   const handleJoin = async () => {
     setJoinError('')
-    const res = await fetch(`/api/boards/trip/${slug}/join`, {
+    const res = await fetch(`${API}/api/boards/trip/${slug}/join`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -104,7 +105,7 @@ export default function TripBoardPage() {
   }
 
   const handleRegenerateInvite = async () => {
-    const res = await fetch(`/api/boards/trip/${slug}/invite-code`, {
+    const res = await fetch(`${API}/api/boards/trip/${slug}/invite-code`, {
       method: 'POST',
       credentials: 'include',
     })
@@ -113,7 +114,7 @@ export default function TripBoardPage() {
   }
 
   const handleHype = async (id: number) => {
-    await fetch(`/api/dares/${id}/hype`, { method: 'POST', credentials: 'include' })
+    await fetch(`${API}/api/dares/${id}/hype`, { method: 'POST', credentials: 'include' })
     fetchBoard()
   }
 
@@ -122,7 +123,7 @@ export default function TripBoardPage() {
   }
 
   const handleProofSubmit = async (id: number, proofUrl: string, caption: string) => {
-    const res = await fetch(`/api/dares/${id}/complete`, {
+    const res = await fetch(`${API}/api/dares/${id}/complete`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -138,7 +139,7 @@ export default function TripBoardPage() {
 
   const handleChicken = async (id: number) => {
     if (!confirm('Are you sure you want to chicken out?')) return
-    await fetch(`/api/dares/${id}/chicken`, {
+    await fetch(`${API}/api/dares/${id}/chicken`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -167,7 +168,7 @@ export default function TripBoardPage() {
   }
 
   const handleReveal = async (dare: Dare) => {
-    const res = await fetch(`/api/dares/${dare.id}/reveal`, {
+    const res = await fetch(`${API}/api/dares/${dare.id}/reveal`, {
       method: 'POST',
       credentials: 'include',
     })

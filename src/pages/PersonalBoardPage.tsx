@@ -12,6 +12,7 @@ import ProofGallery from '../components/ProofGallery'
 import ShareModal from '../components/ShareModal'
 import { toast } from '../components/Toast'
 import { useSoundEffect } from '../hooks/useSoundEffect'
+import { API } from '../config/api'
 
 export default function PersonalBoardPage() {
   const { username } = useParams<{ username: string }>()
@@ -30,7 +31,7 @@ export default function PersonalBoardPage() {
 
   const fetchBoard = useCallback(async () => {
     try {
-      const res = await fetch(`/api/boards/personal/${username}`, { credentials: 'include' })
+      const res = await fetch(`${API}/api/boards/personal/${username}`, { credentials: 'include' })
       if (!res.ok) {
         setError('Board not found')
         return
@@ -50,7 +51,7 @@ export default function PersonalBoardPage() {
   }, [fetchBoard])
 
   const handleHype = async (id: number) => {
-    await fetch(`/api/dares/${id}/hype`, { method: 'POST', credentials: 'include' })
+    await fetch(`${API}/api/dares/${id}/hype`, { method: 'POST', credentials: 'include' })
     fetchBoard()
   }
 
@@ -59,7 +60,7 @@ export default function PersonalBoardPage() {
   }
 
   const handleProofSubmit = async (id: number, proofUrl: string, caption: string) => {
-    const res = await fetch(`/api/dares/${id}/complete`, {
+    const res = await fetch(`${API}/api/dares/${id}/complete`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -75,7 +76,7 @@ export default function PersonalBoardPage() {
 
   const handleChicken = async (id: number) => {
     if (!confirm('Are you sure you want to chicken out?')) return
-    await fetch(`/api/dares/${id}/chicken`, {
+    await fetch(`${API}/api/dares/${id}/chicken`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -104,7 +105,7 @@ export default function PersonalBoardPage() {
   }
 
   const handleReveal = async (dare: Dare) => {
-    const res = await fetch(`/api/dares/${dare.id}/reveal`, {
+    const res = await fetch(`${API}/api/dares/${dare.id}/reveal`, {
       method: 'POST',
       credentials: 'include',
     })

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import AIPanel from './AIPanel'
 import MemberPicker from './MemberPicker'
 import type { BoardMember } from '../types'
+import { API } from '../config/api'
 
 interface Props {
   boardId: number
@@ -35,7 +36,7 @@ export default function DareForm({ boardId, boardType, currentUserId, members, o
     if (boardType === 'personal' && !isAnonymous && !author.trim()) return
     if (boardType === 'trip' && !daredId) return
 
-    await fetch(`/api/boards/${boardId}/dares`, {
+    await fetch(`${API}/api/boards/${boardId}/dares`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

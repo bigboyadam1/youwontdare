@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { API } from '../config/api'
 
 export default function SignupPage() {
   const { signup } = useAuth()
@@ -52,7 +53,7 @@ export default function SignupPage() {
 
       {/* Google Signup */}
       <a
-        href="/api/auth/google"
+        href={`${API}/api/auth/google`}
         className="flex items-center justify-center gap-3 w-full py-3 px-6 border border-[#555048] cursor-pointer no-underline mb-6 transition-colors hover:border-[#aaa49c]"
         style={{ background: '#1c1c1c' }}
       >

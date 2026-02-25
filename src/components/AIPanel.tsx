@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { API } from '../config/api'
 
 interface Props {
   onSelectDare: (dare: string) => void
@@ -16,7 +17,7 @@ export default function AIPanel({ onSelectDare }: Props) {
     setError('')
     setDares([])
     try {
-      const res = await fetch('/api/generate-dares', {
+      const res = await fetch(`${API}/api/generate-dares`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ vibe, location }),

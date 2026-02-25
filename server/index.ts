@@ -14,9 +14,35 @@ import notificationRoutes from './routes/notifications.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-const PORT = 3001;
+const PORT = parseInt(process.env.PORT || '3001');
+const isProd = process.env.NODE_ENV === 'production';
 
-app.use(cors({ origin: true, credentials: true }));
+// Trust proxy in production (Railway sits behind a reverse proxy)
+if (isProd) {
+  app.set('trust proxy', 1);
+}
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3001',
+  'https://youwontdare.xyz',
+  'https://www.youwontdare.xyz',
+];
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
+  credentials: true,
+}));
 app.use(express.json({ limit: '10mb' }));
 
 // --- Session middleware ---
@@ -34,7 +60,8 @@ app.use(
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: isProd ? 'none' : 'lax',
+      secure: isProd,
     },
   })
 );

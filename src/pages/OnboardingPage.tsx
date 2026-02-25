@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, Navigate, useSearchParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { API } from '../config/api'
 
 export default function OnboardingPage() {
   const { user, refresh } = useAuth()
@@ -20,7 +21,7 @@ export default function OnboardingPage() {
     setError('')
     setLoading(true)
 
-    const res = await fetch('/api/auth/setup-username', {
+    const res = await fetch(`${API}/api/auth/setup-username`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

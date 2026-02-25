@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { API } from '../config/api'
 
 export default function NotificationPrompt() {
   const [show, setShow] = useState(false)
@@ -22,7 +23,7 @@ export default function NotificationPrompt() {
       }
 
       // Get VAPID key
-      const res = await fetch('/api/notifications/vapid-key')
+      const res = await fetch(`${API}/api/notifications/vapid-key`)
       const { key } = await res.json()
       if (!key) {
         setShow(false)
@@ -36,7 +37,7 @@ export default function NotificationPrompt() {
         applicationServerKey: key,
       })
 
-      await fetch('/api/notifications/subscribe', {
+      await fetch(`${API}/api/notifications/subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

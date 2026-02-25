@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAnonId } from '../hooks/useAnonId'
+import { API } from '../config/api'
 
 interface Props {
   dareId: number
@@ -19,7 +20,7 @@ export default function ReactionBar({ dareId, fire, skull, crying }: Props) {
   const anonId = useAnonId()
 
   const handleReact = async (reactionType: string) => {
-    const res = await fetch(`/api/dares/${dareId}/react`, {
+    const res = await fetch(`${API}/api/dares/${dareId}/react`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

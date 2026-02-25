@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAnonId } from '../hooks/useAnonId'
+import { API } from '../config/api'
 
 interface Props {
   dareId: number
@@ -14,7 +15,7 @@ export default function SpiceRating({ dareId, avg, count }: Props) {
   const anonId = useAnonId()
 
   const handleRate = async (rating: number) => {
-    const res = await fetch(`/api/dares/${dareId}/spice`, {
+    const res = await fetch(`${API}/api/dares/${dareId}/spice`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
