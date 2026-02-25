@@ -35,21 +35,21 @@ export default function Header() {
                 <Link
                   to="/create-trip"
                   className="px-2.5 py-1 no-underline transition-opacity hover:opacity-80"
-                  style={{ background: '#ff0055', color: '#f0f0f0' }}
+                  style={{ background: '#00ccff', color: '#0d0d0d' }}
                 >
                   + trip
                 </Link>
                 <Link
                   to={`/profile/${user.username}`}
                   className="px-2.5 py-1 no-underline transition-opacity hover:opacity-80"
-                  style={{ background: '#ff0055', color: '#f0f0f0' }}
+                  style={{ background: '#ffcc00', color: '#0d0d0d' }}
                 >
                   profile
                 </Link>
                 <button
                   onClick={logout}
                   className="px-2.5 py-1 cursor-pointer border-none font-[Courier_Prime] text-xs transition-opacity hover:opacity-80"
-                  style={{ background: '#ff0055', color: '#f0f0f0' }}
+                  style={{ background: '#555048', color: '#f0f0f0' }}
                 >
                   logout
                 </button>
