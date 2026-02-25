@@ -2,11 +2,16 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import type { ReactNode } from 'react';
 import type { User } from '../types';
 
+interface AuthResult {
+  error?: string;
+  field?: string;
+}
+
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<{ error?: string }>;
-  signup: (email: string, password: string, username: string, displayName: string) => Promise<{ error?: string }>;
+  login: (email: string, password: string) => Promise<AuthResult>;
+  signup: (email: string, password: string, username: string, displayName: string) => Promise<AuthResult>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
 }
@@ -33,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refresh();
   }, [refresh]);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<AuthResult> => {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -41,12 +46,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       body: JSON.stringify({ email, password }),
     });
     const data = await res.json();
-    if (!res.ok) return { error: data.error };
+    if (!res.ok) return { error: data.error, field: data.field };
     setUser(data.user);
     return {};
   };
 
-  const signup = async (email: string, password: string, username: string, displayName: string) => {
+  const signup = async (email: string, password: string, username: string, displayName: string): Promise<AuthResult> => {
     const res = await fetch('/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -54,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       body: JSON.stringify({ email, password, username, displayName }),
     });
     const data = await res.json();
-    if (!res.ok) return { error: data.error };
+    if (!res.ok) return { error: data.error, field: data.field };
     setUser(data.user);
     return {};
   };

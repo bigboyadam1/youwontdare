@@ -1,10 +1,100 @@
-import { Link, Navigate } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, Navigate, useSearchParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function OnboardingPage() {
-  const { user } = useAuth()
+  const { user, refresh } = useAuth()
+  const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const needsSetup = searchParams.get('setup') === 'true'
+
+  const [username, setUsername] = useState('')
+  const [displayName, setDisplayName] = useState(user?.display_name || '')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   if (!user) return <Navigate to="/login" replace />
+
+  const handleSetupUsername = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    const res = await fetch('/api/auth/setup-username', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username, displayName }),
+    })
+    const data = await res.json()
+    setLoading(false)
+
+    if (!res.ok) {
+      setError(data.error)
+      return
+    }
+
+    await refresh()
+    navigate('/onboarding')
+  }
+
+  // Show username setup form for Google users
+  if (needsSetup) {
+    return (
+      <div className="max-w-md mx-auto px-4 py-16">
+        <h2 className="font-[Anton] text-4xl text-[#00ff99] mb-2">ALMOST THERE</h2>
+        <p className="font-[Courier_Prime] text-sm text-[#aaa49c] mb-8">
+          pick a username for your dare board.
+        </p>
+
+        <form onSubmit={handleSetupUsername} className="flex flex-col gap-4">
+          {error && (
+            <div className="font-[Courier_Prime] text-sm text-[#ff0055] border border-[#ff0055] p-3">
+              {error}
+            </div>
+          )}
+
+          <div>
+            <label className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c] block mb-1">
+              Display Name
+            </label>
+            <input
+              className="dare-input"
+              value={displayName}
+              onChange={e => setDisplayName(e.target.value)}
+              placeholder="How your friends know you"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c] block mb-1">
+              Username
+            </label>
+            <input
+              className="dare-input"
+              value={username}
+              onChange={e => { setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '')); setError('') }}
+              placeholder="your-url-slug"
+              required
+            />
+            <span className="font-[Courier_Prime] text-[10px] text-[#555048] mt-1 block">
+              youwontdare.com/board/{username || '...'}
+            </span>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="font-[Anton] text-xl px-8 py-3 cursor-pointer border-none mt-2"
+            style={{ background: '#ff0055', color: '#f0f0f0', boxShadow: '4px 4px 0 #ff0055aa' }}
+          >
+            {loading ? 'SAVING...' : 'CLAIM USERNAME'}
+          </button>
+        </form>
+      </div>
+    )
+  }
 
   const boardUrl = `${window.location.origin}/board/${user.username}`
 

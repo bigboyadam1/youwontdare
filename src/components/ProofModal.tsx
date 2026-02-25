@@ -8,14 +8,16 @@ interface Props {
 }
 
 export default function ProofModal({ dare, onSubmit, onClose }: Props) {
-  const [imageData, setImageData] = useState('')
+  const [mediaData, setMediaData] = useState('')
+  const [isVideo, setIsVideo] = useState(false)
   const [caption, setCaption] = useState('')
   const [dragging, setDragging] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const handleFile = (file: File) => {
+    setIsVideo(file.type.startsWith('video/'))
     const reader = new FileReader()
-    reader.onload = () => setImageData(reader.result as string)
+    reader.onload = () => setMediaData(reader.result as string)
     reader.readAsDataURL(file)
   }
 
@@ -27,8 +29,8 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
   }
 
   const handleSubmit = () => {
-    if (!imageData) return
-    onSubmit(dare.id, imageData, caption)
+    if (!mediaData) return
+    onSubmit(dare.id, mediaData, caption)
   }
 
   return (
@@ -44,7 +46,7 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
       >
         <h3 className="font-[Anton] text-2xl text-[#00ff99] mb-1">PROVE IT</h3>
         <p className="font-[Courier_Prime] text-xs text-[#aaa49c] mb-4">
-          upload your proof photo
+          upload your proof photo or video
         </p>
 
         {/* Drop zone */}
@@ -59,8 +61,12 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
           onDrop={handleDrop}
           onClick={() => fileRef.current?.click()}
         >
-          {imageData ? (
-            <img src={imageData} alt="proof preview" className="max-h-48 mx-auto" />
+          {mediaData ? (
+            isVideo ? (
+              <video src={mediaData} controls className="max-h-48 mx-auto" />
+            ) : (
+              <img src={mediaData} alt="proof preview" className="max-h-48 mx-auto" />
+            )
           ) : (
             <p className="font-[Courier_Prime] text-sm text-[#aaa49c]">
               Drag & drop or tap to upload
@@ -69,7 +75,7 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
           <input
             ref={fileRef}
             type="file"
-            accept="image/*"
+            accept="image/*,video/*"
             className="hidden"
             onChange={e => {
               const file = e.target.files?.[0]
@@ -94,7 +100,7 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
         <div className="flex gap-3">
           <button
             onClick={handleSubmit}
-            disabled={!imageData}
+            disabled={!mediaData}
             className="font-[Anton] text-lg px-6 py-2 border-none cursor-pointer disabled:opacity-40"
             style={{ background: '#00ff99', color: '#0d0d0d' }}
           >
