@@ -7,7 +7,6 @@ interface Props {
 export default function AIPanel({ onSelectDare }: Props) {
   const [vibe, setVibe] = useState('anything')
   const [location, setLocation] = useState('')
-  const [spice, setSpice] = useState('medium')
   const [dares, setDares] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -20,7 +19,7 @@ export default function AIPanel({ onSelectDare }: Props) {
       const res = await fetch('/api/generate-dares', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vibe, location, spice }),
+        body: JSON.stringify({ vibe, location }),
       })
       if (!res.ok) {
         const data = await res.json()
@@ -73,17 +72,6 @@ export default function AIPanel({ onSelectDare }: Props) {
             placeholder="Optional"
             style={{ fontSize: '0.85rem' }}
           />
-        </div>
-
-        <div>
-          <label className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c] block mb-1">
-            Spice
-          </label>
-          <select value={spice} onChange={e => setSpice(e.target.value)} style={selectStyle}>
-            <option value="mild">Mild</option>
-            <option value="medium">Medium</option>
-            <option value="unhinged">Unhinged</option>
-          </select>
         </div>
 
         <button

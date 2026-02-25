@@ -1,6 +1,8 @@
 import { Routes, Route } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import Header from './components/Header'
+import Toast from './components/Toast'
+import NotificationPrompt from './components/NotificationPrompt'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
@@ -24,6 +26,8 @@ function App() {
   return (
     <div className="min-h-screen">
       <Header />
+      <Toast />
+      <NotificationPrompt />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />

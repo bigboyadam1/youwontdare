@@ -10,9 +10,12 @@ interface Props {
   onChicken: (id: number) => void
   onShare: (dare: Dare) => void
   onProofClick: (url: string, caption: string) => void
+  onDareBack?: (dare: Dare) => void
+  onShareStory?: (dare: Dare) => void
+  onReveal?: (dare: Dare) => void
 }
 
-export default function Board({ dares, boardType, currentUserId, onHype, onComplete, onChicken, onShare, onProofClick }: Props) {
+export default function Board({ dares, boardType, currentUserId, onHype, onComplete, onChicken, onShare, onProofClick, onDareBack, onShareStory, onReveal }: Props) {
   return (
     <section>
       <div className="flex items-center gap-4 mb-6">
@@ -36,11 +39,15 @@ export default function Board({ dares, boardType, currentUserId, onHype, onCompl
             index={i + 1}
             isOwner={currentUserId !== null && dare.dared_id === currentUserId}
             boardType={boardType}
+            currentUserId={currentUserId}
             onHype={() => onHype(dare.id)}
             onComplete={() => onComplete(dare)}
             onChicken={() => onChicken(dare.id)}
             onShare={() => onShare(dare)}
             onProofClick={onProofClick}
+            onDareBack={onDareBack ? () => onDareBack(dare) : undefined}
+            onShareStory={onShareStory ? () => onShareStory(dare) : undefined}
+            onReveal={onReveal ? () => onReveal(dare) : undefined}
           />
         ))}
       </div>

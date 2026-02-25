@@ -30,12 +30,23 @@ router.get('/:username', (req, res) => {
 
   const completionRate = totalDared > 0 ? Math.round((daresCompleted / totalDared) * 100) : 0;
 
+  // Compute streak: consecutive completed dares (most recent first)
+  const allDares = db.prepare(
+    'SELECT status FROM dares WHERE dared_id = ? ORDER BY created_at DESC'
+  ).all(user.id) as { status: string }[];
+  let streak = 0;
+  for (const d of allDares) {
+    if (d.status === 'completed') streak++;
+    else break;
+  }
+
   res.json({
     user,
     stats: {
       daresCompleted,
       daresGiven,
       completionRate,
+      streak,
     },
   });
 });

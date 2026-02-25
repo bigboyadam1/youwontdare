@@ -1,18 +1,25 @@
 import type { Dare } from '../types'
+import ReactionBar from './ReactionBar'
+import SpiceRating from './SpiceRating'
+import Countdown from './Countdown'
 
 interface Props {
   dare: Dare
   index: number
   isOwner: boolean
   boardType: 'personal' | 'trip'
+  currentUserId?: number | null
   onHype: () => void
   onComplete: () => void
   onChicken: () => void
   onShare: () => void
   onProofClick: (url: string, caption: string) => void
+  onDareBack?: () => void
+  onShareStory?: () => void
+  onReveal?: () => void
 }
 
-export default function DareCard({ dare, index, isOwner, boardType, onHype, onComplete, onChicken, onShare, onProofClick }: Props) {
+export default function DareCard({ dare, index, isOwner, boardType, currentUserId, onHype, onComplete, onChicken, onShare, onProofClick, onDareBack, onShareStory, onReveal }: Props) {
   const isHyped = dare.hypes >= 10 && dare.status === 'pending'
   const isCompleted = dare.status === 'completed'
   const isChickened = dare.status === 'chickened'
@@ -93,14 +100,19 @@ export default function DareCard({ dare, index, isOwner, boardType, onHype, onCo
           <div className="flex flex-wrap items-center gap-3 text-xs font-[Courier_Prime] text-[#aaa49c]">
             {boardType === 'trip' ? (
               <>
-                {dare.darer_name && <span>from: {dare.darer_name}</span>}
+                {dare.darer_name && (
+                  <span>from: {dare.is_anonymous && !dare.revealed ? '???' : dare.darer_name}</span>
+                )}
                 {dare.dared_name && <span className="text-[#ffcc00]">&rarr; {dare.dared_name}</span>}
               </>
             ) : (
-              <span>{dare.author}</span>
+              <span>{dare.is_anonymous && !dare.revealed ? '???' : dare.author}</span>
             )}
             {dare.location && <span>📍 {dare.location}</span>}
             {dare.reward && <span>💰 {dare.reward}</span>}
+            {dare.deadline && dare.status === 'pending' && (
+              <Countdown deadline={dare.deadline} />
+            )}
           </div>
 
           {/* Proof block */}
@@ -145,10 +157,10 @@ export default function DareCard({ dare, index, isOwner, boardType, onHype, onCo
                 </button>
                 <button
                   onClick={onChicken}
-                  className="font-[Courier_Prime] text-xs border border-[#555048] px-3 py-1 hover:border-[#aaa49c] transition-colors cursor-pointer"
-                  style={{ background: 'transparent', color: '#555048' }}
+                  className="font-[Courier_Prime] text-xs px-3 py-1 border-none cursor-pointer hover:opacity-80 transition-opacity"
+                  style={{ background: '#ff0055', color: '#f0f0f0' }}
                 >
-                  chicken out
+                  🐔 chicken out
                 </button>
               </>
             )}
@@ -159,7 +171,54 @@ export default function DareCard({ dare, index, isOwner, boardType, onHype, onCo
             >
               ⎘ share
             </button>
+            {/* Dare Back button — trip boards, completed dares, current user was dared */}
+            {boardType === 'trip' && isCompleted && currentUserId === dare.dared_id && onDareBack && (
+              <button
+                onClick={onDareBack}
+                className="font-[Courier_Prime] text-xs px-3 py-1 border-none cursor-pointer"
+                style={{ background: '#ffcc00', color: '#0d0d0d' }}
+              >
+                DARE BACK
+              </button>
+            )}
+            {/* Share story button — completed dares */}
+            {isCompleted && onShareStory && (
+              <button
+                onClick={onShareStory}
+                className="font-[Courier_Prime] text-xs border border-[#555048] px-3 py-1 hover:border-[#ff0055] hover:text-[#ff0055] transition-colors cursor-pointer"
+                style={{ background: 'transparent', color: '#aaa49c' }}
+              >
+                share story
+              </button>
+            )}
+            {/* Reveal button — anonymous dares, darer only, completed */}
+            {isCompleted && dare.is_anonymous === 1 && !dare.revealed && currentUserId === dare.darer_id && onReveal && (
+              <button
+                onClick={onReveal}
+                className="font-[Courier_Prime] text-xs px-3 py-1 border-none cursor-pointer"
+                style={{ background: '#00ccff', color: '#0d0d0d' }}
+              >
+                REVEAL
+              </button>
+            )}
           </div>
+
+          {/* Reactions + Spice on completed dares */}
+          {isCompleted && (
+            <div className="flex flex-wrap items-center gap-3 mt-2 relative z-20">
+              <ReactionBar
+                dareId={dare.id}
+                fire={dare.react_fire || 0}
+                skull={dare.react_skull || 0}
+                crying={dare.react_crying || 0}
+              />
+              <SpiceRating
+                dareId={dare.id}
+                avg={dare.spice_avg ?? null}
+                count={dare.spice_count || 0}
+              />
+            </div>
+          )}
         </div>
 
         {/* Status badge — small label in corner */}

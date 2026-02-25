@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 
 interface ProfileData {
   user: { id: number; username: string; display_name: string; created_at: string }
-  stats: { daresCompleted: number; daresGiven: number; completionRate: number }
+  stats: { daresCompleted: number; daresGiven: number; completionRate: number; streak: number }
 }
 
 export default function ProfilePage() {
@@ -53,7 +53,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-10">
+      <div className="grid grid-cols-4 gap-4 mb-10">
         <div className="border border-[#555048] p-4 text-center" style={{ background: '#131313' }}>
           <div className="font-[Anton] text-3xl text-[#00ff99]">{stats.daresCompleted}</div>
           <div className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c]">
@@ -70,6 +70,12 @@ export default function ProfilePage() {
           <div className="font-[Anton] text-3xl text-[#ffcc00]">{stats.completionRate}%</div>
           <div className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c]">
             Rate
+          </div>
+        </div>
+        <div className="border border-[#555048] p-4 text-center" style={{ background: '#131313' }}>
+          <div className="font-[Anton] text-3xl text-[#ff6600]">{stats.streak}</div>
+          <div className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c]">
+            Streak
           </div>
         </div>
       </div>

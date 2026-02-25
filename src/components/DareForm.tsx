@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AIPanel from './AIPanel'
 import MemberPicker from './MemberPicker'
 import type { BoardMember } from '../types'
@@ -9,33 +9,45 @@ interface Props {
   currentUserId: number | null
   members?: BoardMember[]
   onDareCreated: () => void
+  defaultDaredId?: number | null
+  formRef?: React.RefObject<HTMLFormElement | null>
 }
 
-export default function DareForm({ boardId, boardType, currentUserId, members, onDareCreated }: Props) {
+export default function DareForm({ boardId, boardType, currentUserId, members, onDareCreated, defaultDaredId, formRef }: Props) {
   const [author, setAuthor] = useState('')
   const [text, setText] = useState('')
   const [location, setLocation] = useState('')
   const [reward, setReward] = useState('')
-  const [daredId, setDaredId] = useState<number | null>(null)
+  const [deadline, setDeadline] = useState('')
+  const [daredId, setDaredId] = useState<number | null>(defaultDaredId ?? null)
+  const [isAnonymous, setIsAnonymous] = useState(false)
   const [showAI, setShowAI] = useState(false)
+
+  useEffect(() => {
+    if (defaultDaredId !== undefined && defaultDaredId !== null) {
+      setDaredId(defaultDaredId)
+    }
+  }, [defaultDaredId])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!text.trim()) return
-    if (boardType === 'personal' && !author.trim()) return
+    if (boardType === 'personal' && !isAnonymous && !author.trim()) return
     if (boardType === 'trip' && !daredId) return
 
     await fetch(`/api/boards/${boardId}/dares`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({ author, text, location, reward, daredId }),
+      body: JSON.stringify({ author, text, location, reward, daredId, deadline: deadline || undefined, isAnonymous }),
     })
     setAuthor('')
     setText('')
     setLocation('')
     setReward('')
+    setDeadline('')
     setDaredId(null)
+    setIsAnonymous(false)
     onDareCreated()
   }
 
@@ -46,6 +58,7 @@ export default function DareForm({ boardId, boardType, currentUserId, members, o
 
   return (
     <form
+      ref={formRef}
       onSubmit={handleSubmit}
       className="relative border-2 border-[#555048] mb-12"
       style={{ background: '#131313' }}
@@ -59,8 +72,8 @@ export default function DareForm({ boardId, boardType, currentUserId, members, o
       </div>
 
       <div className="grid grid-cols-2 gap-0 pt-6">
-        {/* Name — only on personal boards (anonymous dares) */}
-        {boardType === 'personal' && (
+        {/* Name — only on personal boards, hidden when anonymous */}
+        {boardType === 'personal' && !isAnonymous && (
           <div className="p-4 border-b border-r border-[#555048]">
             <label className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c] block mb-1">
               Your Name
@@ -112,6 +125,35 @@ export default function DareForm({ boardId, boardType, currentUserId, members, o
             placeholder="Anywhere on earth"
           />
         </div>
+
+        {/* Deadline */}
+        <div className="p-4 border-b border-[#555048]">
+          <label className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c] block mb-1">
+            Deadline (optional)
+          </label>
+          <input
+            type="datetime-local"
+            className="dare-input"
+            value={deadline}
+            onChange={e => setDeadline(e.target.value)}
+          />
+        </div>
+
+        {/* Anonymous checkbox — personal boards only */}
+        {boardType === 'personal' && (
+          <div className="p-4 border-b border-[#555048] flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="anonymous-dare"
+              checked={isAnonymous}
+              onChange={e => setIsAnonymous(e.target.checked)}
+              className="cursor-pointer"
+            />
+            <label htmlFor="anonymous-dare" className="font-[Courier_Prime] text-xs text-[#aaa49c] cursor-pointer">
+              Submit anonymously
+            </label>
+          </div>
+        )}
 
         {/* Dare */}
         <div className="p-4 col-span-2">

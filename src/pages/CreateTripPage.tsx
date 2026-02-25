@@ -6,7 +6,6 @@ export default function CreateTripPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [name, setName] = useState('')
-  const [slug, setSlug] = useState('')
   const [isPublic, setIsPublic] = useState(true)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -22,7 +21,7 @@ export default function CreateTripPage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({ name, slug, isPublic }),
+      body: JSON.stringify({ name, isPublic }),
     })
 
     const data = await res.json()
@@ -61,22 +60,6 @@ export default function CreateTripPage() {
             placeholder="Thailand 2026"
             required
           />
-        </div>
-
-        <div>
-          <label className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c] block mb-1">
-            URL Slug
-          </label>
-          <input
-            className="dare-input"
-            value={slug}
-            onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
-            placeholder="thailand-2026"
-            required
-          />
-          <span className="font-[Courier_Prime] text-[10px] text-[#555048] mt-1 block">
-            youwontdare.com/trip/{slug || '...'}
-          </span>
         </div>
 
         <div className="flex items-center gap-3 mt-2">

@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
-import { useParams } from 'react-router-dom'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import type { Dare, Board as BoardType, BoardMember } from '../types'
 import DareForm from '../components/DareForm'
@@ -9,9 +9,14 @@ import ProofModal from '../components/ProofModal'
 import Lightbox from '../components/Lightbox'
 import Confetti from '../components/Confetti'
 import InviteCodeDisplay from '../components/InviteCodeDisplay'
+import ProofGallery from '../components/ProofGallery'
+import ShareModal from '../components/ShareModal'
+import { toast } from '../components/Toast'
+import { useSoundEffect } from '../hooks/useSoundEffect'
 
 export default function TripBoardPage() {
   const { slug } = useParams<{ slug: string }>()
+  const [searchParams] = useSearchParams()
   const { user } = useAuth()
   const [board, setBoard] = useState<BoardType | null>(null)
   const [dares, setDares] = useState<Dare[]>([])
@@ -24,6 +29,12 @@ export default function TripBoardPage() {
   const [joinCode, setJoinCode] = useState('')
   const [joinError, setJoinError] = useState('')
   const [isMember, setIsMember] = useState(false)
+  const [dareBackTarget, setDareBackTarget] = useState<number | null>(null)
+  const [viewMode, setViewMode] = useState<'board' | 'gallery'>('board')
+  const [shareStoryDare, setShareStoryDare] = useState<Dare | null>(null)
+  const dareFormRef = useRef<HTMLFormElement>(null)
+  const playAirhorn = useSoundEffect('/sounds/airhorn.wav')
+  const playChicken = useSoundEffect('/sounds/chicken.wav')
 
   const fetchBoard = useCallback(async () => {
     try {
@@ -56,6 +67,24 @@ export default function TripBoardPage() {
   useEffect(() => {
     fetchBoard()
   }, [fetchBoard])
+
+  // Auto-join if ?code= query param is present
+  useEffect(() => {
+    const code = searchParams.get('code')
+    if (code && user && !isMember) {
+      fetch(`/api/boards/trip/${slug}/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ inviteCode: code }),
+      }).then(res => {
+        if (res.ok) {
+          setError('')
+          fetchBoard()
+        }
+      }).catch(() => {})
+    }
+  }, [searchParams, user, slug, isMember, fetchBoard])
 
   const handleJoin = async () => {
     setJoinError('')
@@ -102,6 +131,7 @@ export default function TripBoardPage() {
     if (!res.ok) return
     setProofModalDare(null)
     setShowConfetti(true)
+    playAirhorn()
     setTimeout(() => setShowConfetti(false), 3000)
     fetchBoard()
   }
@@ -113,15 +143,41 @@ export default function TripBoardPage() {
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
     })
+    playChicken()
     fetchBoard()
   }
 
-  const handleShare = (dare: Dare) => {
-    navigator.clipboard.writeText(`🔥 DARE: ${dare.text} — YouWontDare`)
+  const handleShare = async (dare: Dare) => {
+    const shareText = `🔥 DARE: ${dare.text} — YouWontDare`
+    const shareUrl = window.location.href
+    if (navigator.share) {
+      try {
+        await navigator.share({ text: shareText, url: shareUrl })
+        return
+      } catch {
+        // User cancelled or share failed — fall through to clipboard
+      }
+    }
+    await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`)
+    toast('Copied to clipboard!')
   }
 
   const handleProofClick = (url: string, caption: string) => {
     setLightboxImage({ url, caption })
+  }
+
+  const handleReveal = async (dare: Dare) => {
+    const res = await fetch(`/api/dares/${dare.id}/reveal`, {
+      method: 'POST',
+      credentials: 'include',
+    })
+    if (res.ok) fetchBoard()
+  }
+
+  const handleDareBack = (dare: Dare) => {
+    // Pre-fill the dare form with the darer as target, then scroll to form
+    setDareBackTarget(dare.darer_id)
+    dareFormRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
   if (loading) {
@@ -217,19 +273,54 @@ export default function TripBoardPage() {
             currentUserId={user.id}
             members={members}
             onDareCreated={fetchBoard}
+            defaultDaredId={dareBackTarget}
+            formRef={dareFormRef}
           />
         )}
 
-        <Board
-          dares={dares}
-          boardType="trip"
-          currentUserId={user?.id ?? null}
-          onHype={handleHype}
-          onComplete={handleComplete}
-          onChicken={handleChicken}
-          onShare={handleShare}
-          onProofClick={handleProofClick}
-        />
+        {/* View toggle */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setViewMode('board')}
+            className="font-[Anton] text-sm px-4 py-1 cursor-pointer border-none"
+            style={{
+              background: viewMode === 'board' ? '#f0f0f0' : 'transparent',
+              color: viewMode === 'board' ? '#0d0d0d' : '#555048',
+              border: viewMode === 'board' ? 'none' : '1px solid #555048',
+            }}
+          >
+            BOARD
+          </button>
+          <button
+            onClick={() => setViewMode('gallery')}
+            className="font-[Anton] text-sm px-4 py-1 cursor-pointer border-none"
+            style={{
+              background: viewMode === 'gallery' ? '#f0f0f0' : 'transparent',
+              color: viewMode === 'gallery' ? '#0d0d0d' : '#555048',
+              border: viewMode === 'gallery' ? 'none' : '1px solid #555048',
+            }}
+          >
+            GALLERY
+          </button>
+        </div>
+
+        {viewMode === 'board' ? (
+          <Board
+            dares={dares}
+            boardType="trip"
+            currentUserId={user?.id ?? null}
+            onHype={handleHype}
+            onComplete={handleComplete}
+            onChicken={handleChicken}
+            onShare={handleShare}
+            onProofClick={handleProofClick}
+            onDareBack={handleDareBack}
+            onShareStory={setShareStoryDare}
+            onReveal={handleReveal}
+          />
+        ) : (
+          <ProofGallery dares={dares} onProofClick={handleProofClick} />
+        )}
       </div>
 
       <StatsBar total={dares.length} completed={completed} enablers={members.length} enablersLabel="Members" />
@@ -249,6 +340,9 @@ export default function TripBoardPage() {
         />
       )}
       {showConfetti && <Confetti />}
+      {shareStoryDare && (
+        <ShareModal dare={shareStoryDare} onClose={() => setShareStoryDare(null)} />
+      )}
     </div>
   )
 }

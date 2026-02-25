@@ -14,6 +14,17 @@ export interface Dare {
   dared_id: number | null;
   darer_name?: string;
   dared_name?: string;
+  // Phase 2: Reactions + Spice
+  react_fire?: number;
+  react_skull?: number;
+  react_crying?: number;
+  spice_avg?: number | null;
+  spice_count?: number;
+  // Phase 3: Timer
+  deadline?: string | null;
+  // Phase 6: Anonymous
+  is_anonymous?: number;
+  revealed?: number;
 }
 
 export interface User {

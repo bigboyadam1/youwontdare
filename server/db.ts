@@ -67,4 +67,62 @@ if (!colNames.has('dared_id')) {
   db.exec('ALTER TABLE dares ADD COLUMN dared_id INTEGER REFERENCES users(id)');
 }
 
+// --- Migration: add google_id to users table ---
+const userColumns = db.prepare("PRAGMA table_info(users)").all() as { name: string }[];
+const userColNames = new Set(userColumns.map(c => c.name));
+
+if (!userColNames.has('google_id')) {
+  db.exec('ALTER TABLE users ADD COLUMN google_id TEXT');
+}
+
+// --- Phase 3: Timer Dares ---
+if (!colNames.has('deadline')) {
+  db.exec('ALTER TABLE dares ADD COLUMN deadline DATETIME');
+}
+
+// --- Phase 6: Anonymous Dares ---
+if (!colNames.has('is_anonymous')) {
+  db.exec('ALTER TABLE dares ADD COLUMN is_anonymous INTEGER DEFAULT 0');
+}
+if (!colNames.has('revealed')) {
+  db.exec('ALTER TABLE dares ADD COLUMN revealed INTEGER DEFAULT 0');
+}
+
+// --- Phase 2: Reactions + Spice Votes ---
+db.exec(`
+  CREATE TABLE IF NOT EXISTS dare_reactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    dare_id INTEGER NOT NULL REFERENCES dares(id),
+    user_id INTEGER,
+    anon_id TEXT,
+    reaction_type TEXT NOT NULL CHECK(reaction_type IN ('fire', 'skull', 'crying')),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(dare_id, user_id, reaction_type),
+    UNIQUE(dare_id, anon_id, reaction_type)
+  );
+
+  CREATE TABLE IF NOT EXISTS spice_votes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    dare_id INTEGER NOT NULL REFERENCES dares(id),
+    user_id INTEGER,
+    anon_id TEXT,
+    rating INTEGER NOT NULL CHECK(rating >= 1 AND rating <= 5),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(dare_id, user_id),
+    UNIQUE(dare_id, anon_id)
+  );
+`);
+
+// --- Phase 7: Push Subscriptions ---
+db.exec(`
+  CREATE TABLE IF NOT EXISTS push_subscriptions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    endpoint TEXT NOT NULL UNIQUE,
+    keys_p256dh TEXT NOT NULL,
+    keys_auth TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+
 export default db;

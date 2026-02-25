@@ -19,7 +19,13 @@ router.get('/personal/:username', (req, res) => {
   }
 
   const dares = db.prepare(`
-    SELECT d.*, u.display_name as darer_name
+    SELECT d.*,
+      CASE WHEN d.is_anonymous = 1 AND d.revealed = 0 THEN '???' ELSE u.display_name END as darer_name,
+      (SELECT COUNT(*) FROM dare_reactions WHERE dare_id = d.id AND reaction_type = 'fire') as react_fire,
+      (SELECT COUNT(*) FROM dare_reactions WHERE dare_id = d.id AND reaction_type = 'skull') as react_skull,
+      (SELECT COUNT(*) FROM dare_reactions WHERE dare_id = d.id AND reaction_type = 'crying') as react_crying,
+      (SELECT ROUND(AVG(rating), 1) FROM spice_votes WHERE dare_id = d.id) as spice_avg,
+      (SELECT COUNT(*) FROM spice_votes WHERE dare_id = d.id) as spice_count
     FROM dares d
     LEFT JOIN users u ON d.darer_id = u.id
     WHERE d.board_id = ?
@@ -62,8 +68,13 @@ router.get('/trip/:slug', (req, res) => {
 
   const dares = db.prepare(`
     SELECT d.*,
-      darer.display_name as darer_name,
-      dared.display_name as dared_name
+      CASE WHEN d.is_anonymous = 1 AND d.revealed = 0 THEN '???' ELSE darer.display_name END as darer_name,
+      dared.display_name as dared_name,
+      (SELECT COUNT(*) FROM dare_reactions WHERE dare_id = d.id AND reaction_type = 'fire') as react_fire,
+      (SELECT COUNT(*) FROM dare_reactions WHERE dare_id = d.id AND reaction_type = 'skull') as react_skull,
+      (SELECT COUNT(*) FROM dare_reactions WHERE dare_id = d.id AND reaction_type = 'crying') as react_crying,
+      (SELECT ROUND(AVG(rating), 1) FROM spice_votes WHERE dare_id = d.id) as spice_avg,
+      (SELECT COUNT(*) FROM spice_votes WHERE dare_id = d.id) as spice_count
     FROM dares d
     LEFT JOIN users darer ON d.darer_id = darer.id
     LEFT JOIN users dared ON d.dared_id = dared.id
@@ -90,29 +101,23 @@ router.get('/trip/:slug', (req, res) => {
 
 // POST /api/boards/trip — create trip board (auth required)
 router.post('/trip', requireAuth, (req, res) => {
-  const { name, slug, isPublic } = req.body;
+  const { name, isPublic } = req.body;
 
-  if (!name || !slug) {
-    res.status(400).json({ error: 'Name and slug are required' });
+  if (!name) {
+    res.status(400).json({ error: 'Name is required' });
     return;
   }
 
-  if (!/^[a-zA-Z0-9_-]+$/.test(slug)) {
-    res.status(400).json({ error: 'Slug can only contain letters, numbers, hyphens, and underscores' });
-    return;
-  }
-
-  const existing = db.prepare('SELECT id FROM boards WHERE slug = ?').get(slug.toLowerCase());
-  if (existing) {
-    res.status(409).json({ error: 'Slug already taken' });
-    return;
-  }
+  // Auto-generate slug from name + random suffix
+  const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30);
+  const suffix = crypto.randomBytes(3).toString('hex');
+  const slug = `${baseSlug}-${suffix}`;
 
   const inviteCode = crypto.randomBytes(4).toString('hex');
 
   const result = db.prepare(
     'INSERT INTO boards (owner_id, type, name, slug, is_public, invite_code) VALUES (?, ?, ?, ?, ?, ?)'
-  ).run(req.session.userId!, 'trip', name, slug.toLowerCase(), isPublic ? 1 : 0, inviteCode);
+  ).run(req.session.userId!, 'trip', name, slug, isPublic ? 1 : 0, inviteCode);
 
   const boardId = result.lastInsertRowid as number;
 
