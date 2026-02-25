@@ -87,7 +87,8 @@ export default function MyBoardsPage() {
       )}
 
       {/* Trip Boards Section */}
-      <h2 className="font-[Anton] text-3xl text-[#00ccff] mb-4">TRIP BOARDS</h2>
+      <h2 className="font-[Anton] text-3xl text-[#00ccff] mb-1">TRIP BOARDS</h2>
+      <p className="font-[Courier_Prime] text-sm text-[#aaa49c] mb-4">who's on board?</p>
       {tripBoards.length > 0 ? (
         <div className="flex flex-col gap-3 mb-8">
           {tripBoards.map(board => (

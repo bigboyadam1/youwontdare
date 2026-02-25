@@ -22,30 +22,34 @@ export default function Header() {
             </h1>
           </Link>
 
-          <nav className="flex items-center gap-3 font-[Courier_Prime] text-xs">
+          <nav className="flex items-center gap-2 font-[Courier_Prime] text-xs">
             {user ? (
               <>
                 <Link
                   to="/my-boards"
-                  className="text-[#aaa49c] hover:text-[#f0f0f0] transition-colors no-underline"
+                  className="px-2.5 py-1 no-underline transition-opacity hover:opacity-80"
+                  style={{ background: '#ff0055', color: '#f0f0f0' }}
                 >
                   my boards
                 </Link>
                 <Link
                   to="/create-trip"
-                  className="text-[#aaa49c] hover:text-[#00ccff] transition-colors no-underline"
+                  className="px-2.5 py-1 no-underline transition-opacity hover:opacity-80"
+                  style={{ background: '#ff0055', color: '#f0f0f0' }}
                 >
                   + trip
                 </Link>
                 <Link
                   to={`/profile/${user.username}`}
-                  className="text-[#aaa49c] hover:text-[#f0f0f0] transition-colors no-underline"
+                  className="px-2.5 py-1 no-underline transition-opacity hover:opacity-80"
+                  style={{ background: '#ff0055', color: '#f0f0f0' }}
                 >
-                  @{user.username}
+                  profile
                 </Link>
                 <button
                   onClick={logout}
-                  className="text-[#555048] hover:text-[#ff0055] transition-colors cursor-pointer border-none bg-transparent font-[Courier_Prime] text-xs"
+                  className="px-2.5 py-1 cursor-pointer border-none font-[Courier_Prime] text-xs transition-opacity hover:opacity-80"
+                  style={{ background: '#ff0055', color: '#f0f0f0' }}
                 >
                   logout
                 </button>
@@ -54,13 +58,14 @@ export default function Header() {
               <>
                 <Link
                   to="/login"
-                  className="text-[#aaa49c] hover:text-[#f0f0f0] transition-colors no-underline"
+                  className="px-2.5 py-1 no-underline transition-opacity hover:opacity-80"
+                  style={{ background: '#ff0055', color: '#f0f0f0' }}
                 >
                   log in
                 </Link>
                 <Link
                   to="/signup"
-                  className="px-3 py-1 no-underline"
+                  className="px-2.5 py-1 no-underline transition-opacity hover:opacity-80"
                   style={{ background: '#ff0055', color: '#f0f0f0' }}
                 >
                   sign up

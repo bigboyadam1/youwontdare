@@ -21,10 +21,12 @@ export default function DareForm({ boardId, boardType, currentUserId, members, o
   const [deadline, setDeadline] = useState('')
   const [daredId, setDaredId] = useState<number | null>(defaultDaredId ?? null)
   const [isAnonymous, setIsAnonymous] = useState(false)
+  const [expanded, setExpanded] = useState(false)
 
   useEffect(() => {
     if (defaultDaredId !== undefined && defaultDaredId !== null) {
       setDaredId(defaultDaredId)
+      setExpanded(true)
     }
   }, [defaultDaredId])
 
@@ -47,7 +49,29 @@ export default function DareForm({ boardId, boardType, currentUserId, members, o
     setDeadline('')
     setDaredId(null)
     setIsAnonymous(false)
+    setExpanded(false)
     onDareCreated()
+  }
+
+  if (!expanded) {
+    return (
+      <button
+        onClick={() => setExpanded(true)}
+        className="relative w-full border-2 border-[#555048] mb-12 p-4 cursor-pointer text-left flex items-center justify-between group transition-colors hover:border-[#ff0055]"
+        style={{ background: '#131313' }}
+      >
+        <div
+          className="absolute -top-4 left-4 px-3 py-0.5 font-[Anton] text-sm tracking-wide"
+          style={{ background: '#ff0055', color: '#f0f0f0' }}
+        >
+          SUBMIT A DARE
+        </div>
+        <span className="font-[Courier_Prime] text-sm text-[#aaa49c] group-hover:text-[#f0f0f0] transition-colors">
+          I dare you to...
+        </span>
+        <span className="font-[Anton] text-lg text-[#ff0055]">+</span>
+      </button>
+    )
   }
 
   return (
@@ -64,6 +88,16 @@ export default function DareForm({ boardId, boardType, currentUserId, members, o
       >
         SUBMIT A DARE
       </div>
+
+      {/* Collapse button */}
+      <button
+        type="button"
+        onClick={() => setExpanded(false)}
+        className="absolute -top-4 right-4 px-2 py-0.5 font-[Courier_Prime] text-xs cursor-pointer border-none"
+        style={{ background: '#555048', color: '#f0f0f0' }}
+      >
+        collapse
+      </button>
 
       <div className="grid grid-cols-2 gap-0 pt-6">
         {/* Name — only on personal boards, hidden when anonymous */}
