@@ -208,7 +208,9 @@ router.get('/google/callback', async (req, res) => {
       // Existing user — set session and redirect
       req.session.userId = user.id;
       req.session.username = user.username;
-      res.redirect(`${FRONTEND_URL}/`);
+      req.session.save(() => {
+        res.redirect(`${FRONTEND_URL}/`);
+      });
       return;
     }
 
@@ -235,7 +237,9 @@ router.get('/google/callback', async (req, res) => {
     req.session.username = tempUsername;
 
     // Redirect to onboarding to pick a username
-    res.redirect(`${FRONTEND_URL}/onboarding?setup=true`);
+    req.session.save(() => {
+      res.redirect(`${FRONTEND_URL}/onboarding?setup=true`);
+    });
   } catch (err) {
     console.error('Google OAuth error:', (err as Error).message);
     res.redirect(`${FRONTEND_URL}/login?error=google_failed`);
