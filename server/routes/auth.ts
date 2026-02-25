@@ -149,11 +149,22 @@ router.get('/google', (_req, res) => {
   res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
 });
 
+// GET /api/auth/google/debug — check OAuth config (temporary)
+router.get('/google/debug', (_req, res) => {
+  res.json({
+    hasClientId: !!GOOGLE_CLIENT_ID,
+    hasClientSecret: !!GOOGLE_CLIENT_SECRET,
+    redirectUri: GOOGLE_REDIRECT_URI,
+    frontendUrl: FRONTEND_URL,
+  });
+});
+
 // GET /api/auth/google/callback — exchange code for tokens, find/create user
 router.get('/google/callback', async (req, res) => {
   const { code } = req.query;
 
   if (!code || !GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+    console.error('Google OAuth callback: missing code or credentials', { hasCode: !!code, hasClientId: !!GOOGLE_CLIENT_ID, hasSecret: !!GOOGLE_CLIENT_SECRET });
     res.redirect(`${FRONTEND_URL}/login?error=google_failed`);
     return;
   }
@@ -172,9 +183,10 @@ router.get('/google/callback', async (req, res) => {
       }),
     });
 
-    const tokens = await tokenRes.json() as { access_token?: string };
+    const tokens = await tokenRes.json() as { access_token?: string; error?: string; error_description?: string };
     if (!tokens.access_token) {
-      res.redirect(`${FRONTEND_URL}/login?error=google_failed`);
+      console.error('Google OAuth token exchange failed:', tokens.error, tokens.error_description);
+      res.redirect(`${FRONTEND_URL}/login?error=token_failed`);
       return;
     }
 
@@ -185,7 +197,8 @@ router.get('/google/callback', async (req, res) => {
     const profile = await profileRes.json() as { id: string; email: string; name: string; picture?: string };
 
     if (!profile.id || !profile.email) {
-      res.redirect(`${FRONTEND_URL}/login?error=google_failed`);
+      console.error('Google OAuth profile fetch failed:', profile);
+      res.redirect(`${FRONTEND_URL}/login?error=profile_failed`);
       return;
     }
 
@@ -208,7 +221,8 @@ router.get('/google/callback', async (req, res) => {
       // Existing user — set session and redirect
       req.session.userId = user.id;
       req.session.username = user.username;
-      req.session.save(() => {
+      req.session.save((err) => {
+        if (err) console.error('Session save error:', err);
         res.redirect(`${FRONTEND_URL}/`);
       });
       return;
@@ -237,7 +251,8 @@ router.get('/google/callback', async (req, res) => {
     req.session.username = tempUsername;
 
     // Redirect to onboarding to pick a username
-    req.session.save(() => {
+    req.session.save((err) => {
+      if (err) console.error('Session save error:', err);
       res.redirect(`${FRONTEND_URL}/onboarding?setup=true`);
     });
   } catch (err) {
