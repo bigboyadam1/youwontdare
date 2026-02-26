@@ -193,6 +193,41 @@ router.post('/trip/:slug/invite-code', requireAuth, (req, res) => {
   res.json({ inviteCode: newCode });
 });
 
+// POST /api/boards/join — join trip by invite code
+router.post('/join', requireAuth, (req, res) => {
+  const { code } = req.body;
+
+  if (!code) {
+    res.status(400).json({ error: 'Invite code is required' });
+    return;
+  }
+
+  const board = db.prepare(
+    "SELECT * FROM boards WHERE invite_code = ? AND type = 'trip'"
+  ).get(code) as Record<string, unknown> | undefined;
+
+  if (!board) {
+    res.status(404).json({ error: 'No trip found with that code' });
+    return;
+  }
+
+  // Check if already a member
+  const existing = db.prepare(
+    'SELECT 1 FROM board_members WHERE board_id = ? AND user_id = ?'
+  ).get(board.id, req.session.userId!);
+
+  if (existing) {
+    res.json({ ok: true, slug: board.slug, message: 'Already a member' });
+    return;
+  }
+
+  db.prepare(
+    'INSERT INTO board_members (board_id, user_id, role) VALUES (?, ?, ?)'
+  ).run(board.id, req.session.userId!, 'member');
+
+  res.json({ ok: true, slug: board.slug });
+});
+
 // GET /api/boards/mine — list user's boards
 router.get('/mine', requireAuth, (req, res) => {
   const boards = db.prepare(`

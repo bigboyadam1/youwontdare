@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { API } from '../config/api'
 
@@ -23,8 +23,12 @@ interface Board {
 
 export default function MyBoardsPage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [boards, setBoards] = useState<Board[]>([])
   const [loading, setLoading] = useState(true)
+  const [joinCode, setJoinCode] = useState('')
+  const [joinError, setJoinError] = useState('')
+  const [joining, setJoining] = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -134,15 +138,67 @@ export default function MyBoardsPage() {
         </p>
       )}
 
-      {/* Create Trip Button */}
-      <Link to="/create-trip" className="no-underline">
-        <button
-          className="font-[Anton] text-xl px-8 py-3 cursor-pointer border-none"
-          style={{ background: '#00ccff', color: '#0d0d0d', boxShadow: '4px 4px 0 #00ccffaa' }}
+      {/* Join Trip + Create Trip */}
+      <div className="flex flex-col sm:flex-row items-start gap-4">
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault()
+            if (!joinCode.trim()) return
+            setJoinError('')
+            setJoining(true)
+            try {
+              const res = await fetch(`${API}/api/boards/join`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ code: joinCode.trim() }),
+              })
+              const data = await res.json()
+              if (!res.ok) {
+                setJoinError(data.error || 'Failed to join')
+              } else {
+                navigate(`/trip/${data.slug}`)
+              }
+            } catch {
+              setJoinError('Network error')
+            } finally {
+              setJoining(false)
+            }
+          }}
+          className="flex items-center gap-2"
         >
-          + CREATE TRIP
-        </button>
-      </Link>
+          <input
+            type="text"
+            placeholder="invite code"
+            value={joinCode}
+            onChange={(e) => { setJoinCode(e.target.value); setJoinError('') }}
+            className="font-[Courier_Prime] text-sm px-3 py-3 border bg-transparent text-[#f0f0f0] outline-none"
+            style={{ borderColor: '#555048', width: '160px' }}
+          />
+          <button
+            type="submit"
+            disabled={joining}
+            className="font-[Anton] text-xl px-6 py-3 cursor-pointer border-none"
+            style={{ background: '#ffcc00', color: '#0d0d0d', boxShadow: '4px 4px 0 #ffcc00aa' }}
+          >
+            {joining ? '...' : 'JOIN'}
+          </button>
+        </form>
+
+        <Link to="/create-trip" className="no-underline">
+          <button
+            className="font-[Anton] text-xl px-8 py-3 cursor-pointer border-none"
+            style={{ background: '#00ccff', color: '#0d0d0d', boxShadow: '4px 4px 0 #00ccffaa' }}
+          >
+            + CREATE TRIP
+          </button>
+        </Link>
+      </div>
+      {joinError && (
+        <p className="font-[Courier_Prime] text-sm mt-2" style={{ color: '#ff4444' }}>
+          {joinError}
+        </p>
+      )}
     </div>
   )
 }
