@@ -63,6 +63,18 @@ router.post('/boards/:boardId/dares', (req, res) => {
 
   const dare = db.prepare('SELECT * FROM dares WHERE id = ?').get(result.lastInsertRowid);
 
+  // Auto-add logged-in darers as friends on personal boards
+  if (board.type === 'personal' && req.session.userId && req.session.userId !== board.owner_id) {
+    const existing = db.prepare(
+      'SELECT 1 FROM board_members WHERE board_id = ? AND user_id = ?'
+    ).get(boardId, req.session.userId);
+    if (!existing) {
+      db.prepare(
+        'INSERT INTO board_members (board_id, user_id, role) VALUES (?, ?, ?)'
+      ).run(boardId, req.session.userId, 'friend');
+    }
+  }
+
   // Notify the dared person
   if (resolvedDaredId) {
     notifyUser(resolvedDaredId, "You've been dared!", text.toUpperCase().slice(0, 60));

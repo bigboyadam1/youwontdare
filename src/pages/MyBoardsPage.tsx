@@ -29,6 +29,7 @@ export default function MyBoardsPage() {
   const [joinCode, setJoinCode] = useState('')
   const [joinError, setJoinError] = useState('')
   const [joining, setJoining] = useState(false)
+  const [shareToast, setShareToast] = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -51,7 +52,8 @@ export default function MyBoardsPage() {
     )
   }
 
-  const personalBoard = boards.find(b => b.type === 'personal')
+  const personalBoard = boards.find(b => b.type === 'personal' && b.owner_id === user.id)
+  const friendsBoards = boards.filter(b => b.type === 'personal' && b.owner_id !== user.id)
   const tripBoards = boards.filter(b => b.type === 'trip')
 
   const formatMembers = (members: Member[]) => {
@@ -66,28 +68,82 @@ export default function MyBoardsPage() {
       {/* Personal Board Section */}
       <h2 className="font-[Anton] text-3xl text-[#f0f0f0] mb-4">MY BOARD</h2>
       {personalBoard ? (
-        <Link
-          to={`/board/${personalBoard.slug}`}
-          className="block no-underline mb-12"
-        >
-          <div
-            className="p-5 border transition-colors hover:border-[#aaa49c]"
-            style={{ background: '#131313', borderColor: '#555048' }}
+        <div className="flex items-stretch gap-2 mb-12">
+          <Link
+            to={`/board/${personalBoard.slug}`}
+            className="block no-underline flex-1"
           >
-            <div className="flex items-center justify-between">
-              <span className="font-[Anton] text-xl text-[#f0f0f0]">
-                {personalBoard.name || 'Personal Board'}
-              </span>
-              <span className="font-[Courier_Prime] text-xs text-[#aaa49c]">
-                {personalBoard.dare_count} {personalBoard.dare_count === 1 ? 'dare' : 'dares'}
-              </span>
+            <div
+              className="p-5 border transition-colors hover:border-[#aaa49c] h-full"
+              style={{ background: '#131313', borderColor: '#555048' }}
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-[Anton] text-xl text-[#f0f0f0]">
+                  {personalBoard.name || 'Personal Board'}
+                </span>
+                <span className="font-[Courier_Prime] text-xs text-[#aaa49c]">
+                  {personalBoard.dare_count} {personalBoard.dare_count === 1 ? 'dare' : 'dares'}
+                </span>
+              </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+          <button
+            onClick={async () => {
+              const shareUrl = `${window.location.origin}/board/${personalBoard.slug}`
+              const shareText = `🔥 Dare me on YouWontDare!`
+              if (navigator.share) {
+                try {
+                  await navigator.share({ text: shareText, url: shareUrl })
+                  return
+                } catch {
+                  // User cancelled or share failed — fall through to clipboard
+                }
+              }
+              await navigator.clipboard.writeText(shareUrl)
+              setShareToast(true)
+              setTimeout(() => setShareToast(false), 2000)
+            }}
+            className="font-[Anton] text-sm px-4 cursor-pointer border transition-colors hover:border-[#aaa49c] flex items-center"
+            style={{ background: '#131313', borderColor: '#555048', color: '#f0f0f0' }}
+            title="Share your board"
+          >
+            {shareToast ? 'COPIED!' : 'SHARE'}
+          </button>
+        </div>
       ) : (
         <p className="font-[Courier_Prime] text-sm text-[#555048] mb-12">
           No personal board yet.
         </p>
+      )}
+
+      {/* Friends' Boards Section */}
+      {friendsBoards.length > 0 && (
+        <>
+          <h2 className="font-[Anton] text-3xl text-[#ffcc00] mb-4">FRIENDS' BOARDS</h2>
+          <div className="flex flex-col gap-3 mb-12">
+            {friendsBoards.map(board => (
+              <Link
+                key={board.id}
+                to={`/board/${board.slug}`}
+                className="block no-underline"
+              >
+                <div
+                  className="p-5 border transition-colors hover:border-[#aaa49c]"
+                  style={{ background: '#131313', borderColor: '#555048' }}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-[Anton] text-xl text-[#f0f0f0]">
+                      {board.owner_name ? `${board.owner_name}'s Board` : board.name}
+                    </span>
+                    <span className="font-[Courier_Prime] text-xs text-[#aaa49c]">
+                      {board.dare_count} {board.dare_count === 1 ? 'dare' : 'dares'}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Trip Boards Section */}
