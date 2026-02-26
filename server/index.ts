@@ -57,10 +57,11 @@ app.use(
     secret: process.env.SESSION_SECRET || 'youwontdare-dev-secret',
     resave: false,
     saveUninitialized: false,
+    rolling: true, // Refresh cookie expiry on every request
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       httpOnly: true,
-      sameSite: isProd ? 'none' : 'lax',
+      sameSite: 'lax',
       secure: isProd,
     },
   })
