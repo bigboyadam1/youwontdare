@@ -9,6 +9,7 @@ import ProofModal from '../components/ProofModal'
 import Lightbox from '../components/Lightbox'
 import Confetti from '../components/Confetti'
 import InviteCodeDisplay from '../components/InviteCodeDisplay'
+import Leaderboard from '../components/Leaderboard'
 import ProofGallery from '../components/ProofGallery'
 import ShareModal from '../components/ShareModal'
 import { toast } from '../components/Toast'
@@ -264,6 +265,11 @@ export default function TripBoardPage() {
               JOIN THIS TRIP
             </button>
           </div>
+        )}
+
+        {/* Leaderboard — only for members when dares exist */}
+        {user && isMember && dares.length > 0 && (
+          <Leaderboard members={members} dares={dares} />
         )}
 
         {/* Dare form — only for members */}
