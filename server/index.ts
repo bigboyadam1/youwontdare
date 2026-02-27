@@ -22,6 +22,15 @@ if (isProd) {
   app.set('trust proxy', 1);
 }
 
+// Redirect www to non-www
+app.use((req, res, next) => {
+  if (req.hostname === 'www.youwontdare.xyz') {
+    res.redirect(301, `https://youwontdare.xyz${req.originalUrl}`);
+    return;
+  }
+  next();
+});
+
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3001',
