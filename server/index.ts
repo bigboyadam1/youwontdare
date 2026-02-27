@@ -63,6 +63,7 @@ app.use(
       httpOnly: true,
       sameSite: 'lax',
       secure: isProd,
+      domain: isProd ? '.youwontdare.xyz' : undefined,
     },
   })
 );
