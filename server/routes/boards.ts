@@ -56,7 +56,11 @@ router.get('/trip/:slug', (req, res) => {
   }
 
   // Check access for private boards
-  if (!board.is_public && req.session.userId) {
+  if (!board.is_public) {
+    if (!req.session.userId) {
+      res.status(403).json({ error: 'Private board — join with invite code' });
+      return;
+    }
     const membership = db.prepare(
       'SELECT 1 FROM board_members WHERE board_id = ? AND user_id = ?'
     ).get(board.id, req.session.userId);

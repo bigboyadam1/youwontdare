@@ -13,7 +13,7 @@ export default function InviteCodeDisplay({ inviteCode, slug, isOwner, onRegener
   const [regenerating, setRegenerating] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  const joinUrl = `${window.location.origin}/trip/${slug}`
+  const joinUrl = `${window.location.origin}/trip/${slug}?code=${code}`
 
   useEffect(() => {
     if (canvasRef.current) {
