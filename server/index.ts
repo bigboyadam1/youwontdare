@@ -24,7 +24,8 @@ if (isProd) {
 
 // Redirect www to non-www
 app.use((req, res, next) => {
-  if (req.hostname === 'www.youwontdare.xyz') {
+  const host = req.headers.host || '';
+  if (host.startsWith('www.')) {
     res.redirect(301, `https://youwontdare.xyz${req.originalUrl}`);
     return;
   }
