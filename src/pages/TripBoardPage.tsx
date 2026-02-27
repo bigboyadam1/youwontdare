@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import type { Dare, Board as BoardType, BoardMember } from '../types'
 import DareForm from '../components/DareForm'
@@ -35,6 +35,7 @@ export default function TripBoardPage() {
   const [viewMode, setViewMode] = useState<'board' | 'gallery'>('board')
   const [shareStoryDare, setShareStoryDare] = useState<Dare | null>(null)
   const dareFormRef = useRef<HTMLFormElement>(null)
+  const navigate = useNavigate()
   const playAirhorn = useSoundEffect('/sounds/airhorn.wav')
   const playChicken = useSoundEffect('/sounds/chicken.wav')
 
@@ -190,8 +191,13 @@ export default function TripBoardPage() {
     )
   }
 
-  // Private board — show join form
+  // Private board — redirect to login if not authenticated, show join form if logged in
   if (error === 'private') {
+    if (!user) {
+      const redirectPath = `/trip/${slug}${searchParams.get('code') ? `?code=${searchParams.get('code')}` : ''}`
+      navigate(`/login?redirect=${encodeURIComponent(redirectPath)}`, { replace: true })
+      return null
+    }
     return (
       <div className="max-w-md mx-auto px-4 py-16 text-center">
         <h2 className="font-[Anton] text-3xl text-[#ffcc00] mb-2">PRIVATE TRIP</h2>

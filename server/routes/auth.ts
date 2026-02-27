@@ -131,11 +131,13 @@ const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'http://localhost
 const FRONTEND_URL = process.env.FRONTEND_URL || '';
 
 // GET /api/auth/google — redirect to Google consent screen
-router.get('/google', (_req, res) => {
+router.get('/google', (req, res) => {
   if (!GOOGLE_CLIENT_ID) {
     res.status(500).json({ error: 'Google OAuth not configured' });
     return;
   }
+
+  const redirect = (req.query.redirect as string) || '';
 
   const params = new URLSearchParams({
     client_id: GOOGLE_CLIENT_ID,
@@ -144,6 +146,7 @@ router.get('/google', (_req, res) => {
     scope: 'openid email profile',
     access_type: 'offline',
     prompt: 'select_account',
+    state: redirect,
   });
 
   res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
@@ -161,7 +164,8 @@ router.get('/google/debug', (_req, res) => {
 
 // GET /api/auth/google/callback — exchange code for tokens, find/create user
 router.get('/google/callback', async (req, res) => {
-  const { code } = req.query;
+  const { code, state } = req.query;
+  const postLoginRedirect = (state as string) || '/';
 
   if (!code || !GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
     console.error('Google OAuth callback: missing code or credentials', { hasCode: !!code, hasClientId: !!GOOGLE_CLIENT_ID, hasSecret: !!GOOGLE_CLIENT_SECRET });
@@ -223,7 +227,7 @@ router.get('/google/callback', async (req, res) => {
       req.session.username = user.username;
       req.session.save((err) => {
         if (err) console.error('Session save error:', err);
-        res.redirect(`${FRONTEND_URL}/`);
+        res.redirect(`${FRONTEND_URL}${postLoginRedirect}`);
       });
       return;
     }

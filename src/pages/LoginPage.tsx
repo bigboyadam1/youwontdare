@@ -34,7 +34,8 @@ export default function LoginPage() {
       setError(result.error)
       triggerShake()
     } else {
-      navigate('/')
+      const redirect = searchParams.get('redirect')
+      navigate(redirect || '/')
     }
   }
 
@@ -45,7 +46,7 @@ export default function LoginPage() {
 
       {/* Google Login */}
       <a
-        href={`${API}/api/auth/google`}
+        href={`${API}/api/auth/google${searchParams.get('redirect') ? `?redirect=${encodeURIComponent(searchParams.get('redirect')!)}` : ''}`}
         className="flex items-center justify-center gap-3 w-full py-3 px-6 border border-[#555048] cursor-pointer no-underline mb-6 transition-colors hover:border-[#aaa49c]"
         style={{ background: '#1c1c1c' }}
       >
