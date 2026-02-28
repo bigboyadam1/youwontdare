@@ -5,7 +5,7 @@ interface Props {
   dare: Dare
   index: number
   isOwner: boolean
-  boardType: 'personal' | 'trip'
+  boardType: 'personal' | 'group'
   currentUserId?: number | null
   onHype: () => void
   onComplete: () => void
@@ -97,7 +97,7 @@ export default function DareCard({ dare, index, isOwner, boardType, currentUserI
             {dare.text}
           </p>
           <div className="flex flex-wrap items-center gap-3 text-xs font-[Courier_Prime] text-[#aaa49c]">
-            {boardType === 'trip' ? (
+            {boardType === 'group' ? (
               <>
                 {dare.darer_name && (
                   <span>from: {dare.is_anonymous && !dare.revealed ? '???' : dare.darer_name}</span>
@@ -171,7 +171,7 @@ export default function DareCard({ dare, index, isOwner, boardType, currentUserI
               ⎘ share
             </button>
             {/* Dare Back button — trip boards, completed dares, current user was dared */}
-            {boardType === 'trip' && isCompleted && currentUserId === dare.dared_id && onDareBack && (
+            {boardType === 'group' && isCompleted && currentUserId === dare.dared_id && onDareBack && (
               <button
                 onClick={onDareBack}
                 className="font-[Courier_Prime] text-xs px-3 py-1 border-none cursor-pointer"

@@ -33,11 +33,11 @@ export default function Header() {
                   my boards
                 </Link>
                 <Link
-                  to="/create-trip"
+                  to="/create-group"
                   className="px-2.5 py-1 no-underline transition-opacity hover:opacity-80"
                   style={{ background: '#00ccff', color: '#0d0d0d' }}
                 >
-                  + trip
+                  + group
                 </Link>
                 <Link
                   to={`/profile/${user.username}`}

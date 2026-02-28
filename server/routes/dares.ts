@@ -22,10 +22,10 @@ router.post('/boards/:boardId/dares', (req, res) => {
     return;
   }
 
-  // Trip boards require auth
-  if (board.type === 'trip') {
+  // Group boards require auth
+  if (board.type === 'group') {
     if (!req.session.userId) {
-      res.status(401).json({ error: 'Login required for trip boards' });
+      res.status(401).json({ error: 'Login required for group boards' });
       return;
     }
     // Must be a member
@@ -39,15 +39,15 @@ router.post('/boards/:boardId/dares', (req, res) => {
   }
 
   // For personal boards: dared_id is always the board owner
-  // For trip boards: dared_id is specified in the request
+  // For group boards: dared_id is specified in the request
   let resolvedDaredId: number | null = null;
   let resolvedDarerId: number | null = req.session.userId || null;
 
   if (board.type === 'personal') {
     resolvedDaredId = board.owner_id as number;
-  } else if (board.type === 'trip') {
+  } else if (board.type === 'group') {
     if (!daredId) {
-      res.status(400).json({ error: 'Must specify who you are daring on trip boards' });
+      res.status(400).json({ error: 'Must specify who you are daring on group boards' });
       return;
     }
     resolvedDaredId = Number(daredId);

@@ -5,7 +5,7 @@ import { API } from '../config/api'
 
 interface Props {
   boardId: number
-  boardType: 'personal' | 'trip'
+  boardType: 'personal' | 'group'
   currentUserId: number | null
   members?: BoardMember[]
   onDareCreated: () => void
@@ -34,7 +34,7 @@ export default function DareForm({ boardId, boardType, currentUserId, members, o
     e.preventDefault()
     if (!text.trim()) return
     if (boardType === 'personal' && !isAnonymous && !author.trim()) return
-    if (boardType === 'trip' && !daredId) return
+    if (boardType === 'group' && !daredId) return
 
     await fetch(`${API}/api/boards/${boardId}/dares`, {
       method: 'POST',
@@ -116,8 +116,8 @@ export default function DareForm({ boardId, boardType, currentUserId, members, o
           </div>
         )}
 
-        {/* Member picker — only on trip boards */}
-        {boardType === 'trip' && members && currentUserId && (
+        {/* Member picker — only on group boards */}
+        {boardType === 'group' && members && currentUserId && (
           <div className="p-4 border-b border-r border-[#555048]">
             <MemberPicker
               members={members}

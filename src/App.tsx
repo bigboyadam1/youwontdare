@@ -8,8 +8,8 @@ import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import OnboardingPage from './pages/OnboardingPage'
 import PersonalBoardPage from './pages/PersonalBoardPage'
-import TripBoardPage from './pages/TripBoardPage'
-import CreateTripPage from './pages/CreateTripPage'
+import GroupBoardPage from './pages/GroupBoardPage'
+import CreateGroupPage from './pages/CreateGroupPage'
 import ProfilePage from './pages/ProfilePage'
 import MyBoardsPage from './pages/MyBoardsPage'
 import SharePreviewPage from './pages/SharePreviewPage'
@@ -37,8 +37,8 @@ function App() {
         <Route path="/onboarding" element={<OnboardingPage />} />
         <Route path="/my-boards" element={<MyBoardsPage />} />
         <Route path="/board/:username" element={<PersonalBoardPage />} />
-        <Route path="/trip/:slug" element={<TripBoardPage />} />
-        <Route path="/create-trip" element={<CreateTripPage />} />
+        <Route path="/group/:slug" element={<GroupBoardPage />} />
+        <Route path="/create-group" element={<CreateGroupPage />} />
         <Route path="/profile/:username" element={<ProfilePage />} />
         <Route path="/dev/share-preview" element={<SharePreviewPage />} />
       </Routes>

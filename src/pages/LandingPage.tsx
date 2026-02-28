@@ -30,10 +30,10 @@ export default function LandingPage() {
             MY BOARD
           </Link>
           <Link
-            to="/create-trip"
+            to="/create-group"
             className="font-[Courier_Prime] text-sm text-[#00ccff] hover:text-[#f0f0f0] transition-colors no-underline"
           >
-            or create a trip board →
+            or create a group board →
           </Link>
         </div>
       ) : (
@@ -63,9 +63,9 @@ export default function LandingPage() {
           </p>
         </div>
         <div className="border border-[#555048] p-5" style={{ background: '#131313' }}>
-          <div className="font-[Anton] text-lg text-[#00ccff] mb-2">TRIP BOARDS</div>
+          <div className="font-[Anton] text-lg text-[#00ccff] mb-2">GROUP BOARDS</div>
           <p className="font-[Courier_Prime] text-xs text-[#aaa49c]">
-            Travelling with people. Everyone dares everyone. It gets out of hand.
+            Stag do. Work trip. Whatever. Everyone dares everyone. It gets out of hand.
           </p>
         </div>
         <div className="border border-[#555048] p-5" style={{ background: '#131313' }}>

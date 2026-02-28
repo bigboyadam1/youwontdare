@@ -13,7 +13,7 @@ interface Board {
   id: number
   slug: string
   name: string
-  type: 'personal' | 'trip'
+  type: 'personal' | 'group'
   owner_id: number
   owner_name: string
   dare_count: number
@@ -54,7 +54,7 @@ export default function MyBoardsPage() {
 
   const personalBoard = boards.find(b => b.type === 'personal' && b.owner_id === user.id)
   const friendsBoards = boards.filter(b => b.type === 'personal' && b.owner_id !== user.id)
-  const tripBoards = boards.filter(b => b.type === 'trip')
+  const groupBoards = boards.filter(b => b.type === 'group')
 
   const formatMembers = (members: Member[]) => {
     if (!members || members.length === 0) return ''
@@ -146,15 +146,15 @@ export default function MyBoardsPage() {
         </>
       )}
 
-      {/* Trip Boards Section */}
-      <h2 className="font-[Anton] text-3xl text-[#00ccff] mb-1">TRIP BOARDS</h2>
+      {/* Group Boards Section */}
+      <h2 className="font-[Anton] text-3xl text-[#00ccff] mb-1">GROUP BOARDS</h2>
       <p className="font-[Courier_Prime] text-sm text-[#aaa49c] mb-4">who's on board?</p>
-      {tripBoards.length > 0 ? (
+      {groupBoards.length > 0 ? (
         <div className="flex flex-col gap-3 mb-8">
-          {tripBoards.map(board => (
+          {groupBoards.map(board => (
             <Link
               key={board.id}
-              to={`/trip/${board.slug}`}
+              to={`/group/${board.slug}`}
               className="block no-underline"
             >
               <div
@@ -190,11 +190,11 @@ export default function MyBoardsPage() {
         </div>
       ) : (
         <p className="font-[Courier_Prime] text-sm text-[#555048] mb-8">
-          No trip boards yet. Create one or join with an invite code.
+          No group boards yet. Create one or join with an invite code.
         </p>
       )}
 
-      {/* Join Trip + Create Trip */}
+      {/* Join Group + Create Group */}
       <div className="flex flex-col sm:flex-row items-start gap-4">
         <form
           onSubmit={async (e) => {
@@ -213,7 +213,7 @@ export default function MyBoardsPage() {
               if (!res.ok) {
                 setJoinError(data.error || 'Failed to join')
               } else {
-                navigate(`/trip/${data.slug}`)
+                navigate(`/group/${data.slug}`)
               }
             } catch {
               setJoinError('Network error')
@@ -241,12 +241,12 @@ export default function MyBoardsPage() {
           </button>
         </form>
 
-        <Link to="/create-trip" className="no-underline">
+        <Link to="/create-group" className="no-underline">
           <button
             className="font-[Anton] text-xl px-8 py-3 cursor-pointer border-none"
             style={{ background: '#00ccff', color: '#0d0d0d', boxShadow: '4px 4px 0 #00ccffaa' }}
           >
-            + CREATE TRIP
+            + CREATE GROUP
           </button>
         </Link>
       </div>

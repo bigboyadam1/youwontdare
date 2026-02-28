@@ -42,16 +42,16 @@ router.get('/personal/:username', (req, res) => {
   res.json({ board, dares });
 });
 
-// GET /api/boards/trip/:slug — board + dares + members
-router.get('/trip/:slug', (req, res) => {
+// GET /api/boards/group/:slug — board + dares + members
+router.get('/group/:slug', (req, res) => {
   const { slug } = req.params;
 
   const board = db.prepare(
-    "SELECT b.*, u.display_name as owner_name FROM boards b JOIN users u ON b.owner_id = u.id WHERE b.slug = ? AND b.type = 'trip'"
+    "SELECT b.*, u.display_name as owner_name FROM boards b JOIN users u ON b.owner_id = u.id WHERE b.slug = ? AND b.type = 'group'"
   ).get(slug) as Record<string, unknown> | undefined;
 
   if (!board) {
-    res.status(404).json({ error: 'Trip board not found' });
+    res.status(404).json({ error: 'Group board not found' });
     return;
   }
 
@@ -103,8 +103,8 @@ router.get('/trip/:slug', (req, res) => {
   res.json({ board, dares, members });
 });
 
-// POST /api/boards/trip — create trip board (auth required)
-router.post('/trip', requireAuth, (req, res) => {
+// POST /api/boards/group — create group board (auth required)
+router.post('/group', requireAuth, (req, res) => {
   const { name, isPublic } = req.body;
 
   if (!name) {
@@ -121,7 +121,7 @@ router.post('/trip', requireAuth, (req, res) => {
 
   const result = db.prepare(
     'INSERT INTO boards (owner_id, type, name, slug, is_public, invite_code) VALUES (?, ?, ?, ?, ?, ?)'
-  ).run(req.session.userId!, 'trip', name, slug, isPublic ? 1 : 0, inviteCode);
+  ).run(req.session.userId!, 'group', name, slug, isPublic ? 1 : 0, inviteCode);
 
   const boardId = result.lastInsertRowid as number;
 
@@ -134,17 +134,17 @@ router.post('/trip', requireAuth, (req, res) => {
   res.status(201).json({ board });
 });
 
-// POST /api/boards/trip/:slug/join — join trip (invite code for private)
-router.post('/trip/:slug/join', requireAuth, (req, res) => {
+// POST /api/boards/group/:slug/join — join group (invite code for private)
+router.post('/group/:slug/join', requireAuth, (req, res) => {
   const { slug } = req.params;
   const { inviteCode } = req.body;
 
   const board = db.prepare(
-    "SELECT * FROM boards WHERE slug = ? AND type = 'trip'"
+    "SELECT * FROM boards WHERE slug = ? AND type = 'group'"
   ).get(slug) as Record<string, unknown> | undefined;
 
   if (!board) {
-    res.status(404).json({ error: 'Trip board not found' });
+    res.status(404).json({ error: 'Group board not found' });
     return;
   }
 
@@ -173,16 +173,16 @@ router.post('/trip/:slug/join', requireAuth, (req, res) => {
   res.json({ ok: true });
 });
 
-// POST /api/boards/trip/:slug/invite-code — regenerate invite code (owner only)
-router.post('/trip/:slug/invite-code', requireAuth, (req, res) => {
+// POST /api/boards/group/:slug/invite-code — regenerate invite code (owner only)
+router.post('/group/:slug/invite-code', requireAuth, (req, res) => {
   const { slug } = req.params;
 
   const board = db.prepare(
-    "SELECT * FROM boards WHERE slug = ? AND type = 'trip'"
+    "SELECT * FROM boards WHERE slug = ? AND type = 'group'"
   ).get(slug) as Record<string, unknown> | undefined;
 
   if (!board) {
-    res.status(404).json({ error: 'Trip board not found' });
+    res.status(404).json({ error: 'Group board not found' });
     return;
   }
 
@@ -197,7 +197,7 @@ router.post('/trip/:slug/invite-code', requireAuth, (req, res) => {
   res.json({ inviteCode: newCode });
 });
 
-// POST /api/boards/join — join trip by invite code
+// POST /api/boards/join — join group by invite code
 router.post('/join', requireAuth, (req, res) => {
   const { code } = req.body;
 
@@ -207,11 +207,11 @@ router.post('/join', requireAuth, (req, res) => {
   }
 
   const board = db.prepare(
-    "SELECT * FROM boards WHERE invite_code = ? AND type = 'trip'"
+    "SELECT * FROM boards WHERE invite_code = ? AND type = 'group'"
   ).get(code) as Record<string, unknown> | undefined;
 
   if (!board) {
-    res.status(404).json({ error: 'No trip found with that code' });
+    res.status(404).json({ error: 'No group found with that code' });
     return;
   }
 
@@ -246,7 +246,7 @@ router.get('/mine', requireAuth, (req, res) => {
   `).all(req.session.userId!) as any[];
 
   const boardsWithMembers = boards.map(board => {
-    if (board.type === 'trip') {
+    if (board.type === 'group') {
       const members = db.prepare(`
         SELECT u.id, u.username, u.display_name
         FROM board_members bm

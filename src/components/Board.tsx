@@ -3,7 +3,7 @@ import DareCard from './DareCard'
 
 interface Props {
   dares: Dare[]
-  boardType: 'personal' | 'trip'
+  boardType: 'personal' | 'group'
   currentUserId: number | null
   onHype: (id: number) => void
   onComplete: (dare: Dare) => void
@@ -37,7 +37,7 @@ export default function Board({ dares, boardType, currentUserId, onHype, onCompl
           <DareCard
             key={dare.id}
             dare={dare}
-            index={i + 1}
+            index={dares.length - i}
             isOwner={currentUserId !== null && dare.dared_id === currentUserId}
             boardType={boardType}
             currentUserId={currentUserId}

@@ -3,7 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { API } from '../config/api'
 
-export default function CreateTripPage() {
+export default function CreateGroupPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [name, setName] = useState('')
@@ -18,7 +18,7 @@ export default function CreateTripPage() {
     setError('')
     setLoading(true)
 
-    const res = await fetch(`${API}/api/boards/trip`, {
+    const res = await fetch(`${API}/api/boards/group`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -33,14 +33,14 @@ export default function CreateTripPage() {
       return
     }
 
-    navigate(`/trip/${data.board.slug}`)
+    navigate(`/group/${data.board.slug}`)
   }
 
   return (
     <div className="max-w-md mx-auto px-4 py-16">
-      <h2 className="font-[Anton] text-4xl text-[#00ccff] mb-2">CREATE TRIP</h2>
+      <h2 className="font-[Anton] text-4xl text-[#00ccff] mb-2">CREATE GROUP</h2>
       <p className="font-[Courier_Prime] text-sm text-[#aaa49c] mb-8">
-        going somewhere. might as well make it worse.
+        stag do. work trip. whatever. dare each other.
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -52,13 +52,13 @@ export default function CreateTripPage() {
 
         <div>
           <label className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c] block mb-1">
-            Trip Name
+            Group Name
           </label>
           <input
             className="dare-input"
             value={name}
             onChange={e => setName(e.target.value)}
-            placeholder="Thailand 2026"
+            placeholder="the lads"
             required
           />
         </div>
@@ -99,7 +99,7 @@ export default function CreateTripPage() {
           className="font-[Anton] text-xl px-8 py-3 cursor-pointer border-none mt-4"
           style={{ background: '#00ccff', color: '#0d0d0d', boxShadow: '4px 4px 0 #00ccffaa' }}
         >
-          {loading ? 'CREATING...' : 'CREATE TRIP BOARD'}
+          {loading ? 'CREATING...' : 'CREATE GROUP BOARD'}
         </button>
       </form>
     </div>

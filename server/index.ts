@@ -119,14 +119,14 @@ app.get('/board/:username', (req, res) => {
   res.sendFile(indexPath);
 });
 
-app.get('/trip/:slug', (req, res) => {
+app.get('/group/:slug', (req, res) => {
   const indexPath = path.join(distPath, 'index.html');
   const board = db.prepare(
-    "SELECT name FROM boards WHERE slug = ? AND type = 'trip'"
+    "SELECT name FROM boards WHERE slug = ? AND type = 'group'"
   ).get(req.params.slug) as { name: string } | undefined;
 
   if (board) {
-    const html = injectOgTags(indexPath, `${board.name} — YouWontDare Trip`, `Join the trip and dare each other. YouWontDare`);
+    const html = injectOgTags(indexPath, `${board.name} — YouWontDare Group`, `Join the group and dare each other. YouWontDare`);
     if (html) { res.send(html); return; }
   }
   res.sendFile(indexPath);

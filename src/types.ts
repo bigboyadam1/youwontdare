@@ -38,7 +38,7 @@ export interface User {
 export interface Board {
   id: number;
   owner_id: number;
-  type: 'personal' | 'trip';
+  type: 'personal' | 'group';
   name: string;
   slug: string;
   is_public: number;

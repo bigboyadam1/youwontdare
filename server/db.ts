@@ -21,7 +21,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS boards (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     owner_id INTEGER NOT NULL REFERENCES users(id),
-    type TEXT NOT NULL CHECK(type IN ('personal', 'trip')),
+    type TEXT NOT NULL CHECK(type IN ('personal', 'group')),
     name TEXT NOT NULL,
     slug TEXT NOT NULL UNIQUE,
     is_public INTEGER DEFAULT 1,
@@ -53,6 +53,9 @@ db.exec(`
     dared_id INTEGER REFERENCES users(id)
   );
 `);
+
+// --- Migration: rename 'trip' board type to 'group' ---
+db.exec("UPDATE boards SET type = 'group' WHERE type = 'trip'");
 
 // --- Migration: add columns to existing dares table if missing ---
 const columns = db.prepare("PRAGMA table_info(dares)").all() as { name: string }[];

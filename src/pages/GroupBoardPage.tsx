@@ -16,7 +16,7 @@ import { toast } from '../components/Toast'
 import { useSoundEffect } from '../hooks/useSoundEffect'
 import { API } from '../config/api'
 
-export default function TripBoardPage() {
+export default function GroupBoardPage() {
   const { slug } = useParams<{ slug: string }>()
   const [searchParams] = useSearchParams()
   const { user } = useAuth()
@@ -41,7 +41,7 @@ export default function TripBoardPage() {
 
   const fetchBoard = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/api/boards/trip/${slug}`, { credentials: 'include' })
+      const res = await fetch(`${API}/api/boards/group/${slug}`, { credentials: 'include' })
       if (res.status === 403) {
         setError('private')
         setLoading(false)
@@ -75,7 +75,7 @@ export default function TripBoardPage() {
   useEffect(() => {
     const code = searchParams.get('code')
     if (code && user && !isMember) {
-      fetch(`${API}/api/boards/trip/${slug}/join`, {
+      fetch(`${API}/api/boards/group/${slug}/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -91,7 +91,7 @@ export default function TripBoardPage() {
 
   const handleJoin = async () => {
     setJoinError('')
-    const res = await fetch(`${API}/api/boards/trip/${slug}/join`, {
+    const res = await fetch(`${API}/api/boards/group/${slug}/join`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -107,7 +107,7 @@ export default function TripBoardPage() {
   }
 
   const handleRegenerateInvite = async () => {
-    const res = await fetch(`${API}/api/boards/trip/${slug}/invite-code`, {
+    const res = await fetch(`${API}/api/boards/group/${slug}/invite-code`, {
       method: 'POST',
       credentials: 'include',
     })
@@ -195,7 +195,7 @@ export default function TripBoardPage() {
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-16 text-center">
-        <p className="font-[Courier_Prime] text-[#aaa49c]">Loading trip board...</p>
+        <p className="font-[Courier_Prime] text-[#aaa49c]">Loading group board...</p>
       </div>
     )
   }
@@ -203,13 +203,13 @@ export default function TripBoardPage() {
   // Private board — redirect to login if not authenticated, show join form if logged in
   if (error === 'private') {
     if (!user) {
-      const redirectPath = `/trip/${slug}${searchParams.get('code') ? `?code=${searchParams.get('code')}` : ''}`
+      const redirectPath = `/group/${slug}${searchParams.get('code') ? `?code=${searchParams.get('code')}` : ''}`
       navigate(`/login?redirect=${encodeURIComponent(redirectPath)}`, { replace: true })
       return null
     }
     return (
       <div className="max-w-md mx-auto px-4 py-16 text-center">
-        <h2 className="font-[Anton] text-3xl text-[#ffcc00] mb-2">PRIVATE TRIP</h2>
+        <h2 className="font-[Anton] text-3xl text-[#ffcc00] mb-2">PRIVATE GROUP</h2>
         <p className="font-[Courier_Prime] text-sm text-[#aaa49c] mb-6">Enter the invite code to join</p>
         {joinError && (
           <div className="font-[Courier_Prime] text-sm text-[#ff0055] border border-[#ff0055] p-3 mb-4">
@@ -240,7 +240,7 @@ export default function TripBoardPage() {
     return (
       <div className="max-w-3xl mx-auto px-4 py-16 text-center">
         <h2 className="font-[Anton] text-3xl text-[#ff0055] mb-2">NOT FOUND</h2>
-        <p className="font-[Courier_Prime] text-sm text-[#aaa49c]">{error || 'Trip board not found'}</p>
+        <p className="font-[Courier_Prime] text-sm text-[#aaa49c]">{error || 'Group board not found'}</p>
       </div>
     )
   }
@@ -258,7 +258,7 @@ export default function TripBoardPage() {
             {dares.length} dare{dares.length !== 1 ? 's' : ''} · <span style={{ color: '#00ff99' }}>{completed} completed</span> · {members.length} member{members.length !== 1 ? 's' : ''}
           </p>
           <p className="font-[Courier_Prime] text-sm text-[#aaa49c]">
-            {members.length} traveler{members.length !== 1 ? 's' : ''} — dare each other
+            {members.length} member{members.length !== 1 ? 's' : ''} — dare each other
           </p>
         </div>
 
@@ -280,7 +280,7 @@ export default function TripBoardPage() {
               className="font-[Anton] text-lg px-8 py-2 border-none cursor-pointer"
               style={{ background: '#00ccff', color: '#0d0d0d' }}
             >
-              JOIN THIS TRIP
+              JOIN THIS GROUP
             </button>
           </div>
         )}
@@ -294,7 +294,7 @@ export default function TripBoardPage() {
         {user && isMember && (
           <DareForm
             boardId={board.id}
-            boardType="trip"
+            boardType="group"
             currentUserId={user.id}
             members={members}
             onDareCreated={fetchBoard}
@@ -332,7 +332,7 @@ export default function TripBoardPage() {
         {viewMode === 'board' ? (
           <Board
             dares={dares}
-            boardType="trip"
+            boardType="group"
             currentUserId={user?.id ?? null}
             onHype={handleHype}
             onComplete={handleComplete}

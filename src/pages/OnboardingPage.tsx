@@ -142,10 +142,10 @@ export default function OnboardingPage() {
           GO TO MY BOARD
         </Link>
         <Link
-          to="/create-trip"
+          to="/create-group"
           className="font-[Courier_Prime] text-sm text-[#00ccff] hover:text-[#f0f0f0] transition-colors no-underline"
         >
-          create a trip board →
+          create a group board →
         </Link>
       </div>
     </div>
