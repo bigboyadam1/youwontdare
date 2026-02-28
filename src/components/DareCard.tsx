@@ -17,9 +17,10 @@ interface Props {
   onDareBack?: () => void
   onShareStory?: () => void
   onReveal?: () => void
+  onDelete?: () => void
 }
 
-export default function DareCard({ dare, index, isOwner, boardType, currentUserId, onHype, onComplete, onChicken, onShare, onProofClick, onDareBack, onShareStory, onReveal }: Props) {
+export default function DareCard({ dare, index, isOwner, boardType, currentUserId, onHype, onComplete, onChicken, onShare, onProofClick, onDareBack, onShareStory, onReveal, onDelete }: Props) {
   const isHyped = dare.hypes >= 10 && dare.status === 'pending'
   const isCompleted = dare.status === 'completed'
   const isChickened = dare.status === 'chickened'
@@ -199,6 +200,16 @@ export default function DareCard({ dare, index, isOwner, boardType, currentUserI
                 style={{ background: '#00ccff', color: '#0d0d0d' }}
               >
                 REVEAL
+              </button>
+            )}
+            {/* Delete button — dare creator only */}
+            {currentUserId === dare.darer_id && onDelete && (
+              <button
+                onClick={onDelete}
+                className="font-[Courier_Prime] text-xs border border-[#555048] px-3 py-1 hover:border-[#ff0055] hover:text-[#ff0055] transition-colors cursor-pointer"
+                style={{ background: 'transparent', color: '#555048' }}
+              >
+                delete
               </button>
             )}
           </div>

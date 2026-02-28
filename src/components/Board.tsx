@@ -13,9 +13,10 @@ interface Props {
   onDareBack?: (dare: Dare) => void
   onShareStory?: (dare: Dare) => void
   onReveal?: (dare: Dare) => void
+  onDelete?: (dare: Dare) => void
 }
 
-export default function Board({ dares, boardType, currentUserId, onHype, onComplete, onChicken, onShare, onProofClick, onDareBack, onShareStory, onReveal }: Props) {
+export default function Board({ dares, boardType, currentUserId, onHype, onComplete, onChicken, onShare, onProofClick, onDareBack, onShareStory, onReveal, onDelete }: Props) {
   return (
     <section>
       <div className="flex items-center gap-4 mb-6">
@@ -48,6 +49,7 @@ export default function Board({ dares, boardType, currentUserId, onHype, onCompl
             onDareBack={onDareBack ? () => onDareBack(dare) : undefined}
             onShareStory={onShareStory ? () => onShareStory(dare) : undefined}
             onReveal={onReveal ? () => onReveal(dare) : undefined}
+            onDelete={onDelete ? () => onDelete(dare) : undefined}
           />
         ))}
       </div>

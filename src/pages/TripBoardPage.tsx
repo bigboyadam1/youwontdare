@@ -177,6 +177,15 @@ export default function TripBoardPage() {
     if (res.ok) fetchBoard()
   }
 
+  const handleDelete = async (dare: Dare) => {
+    if (!confirm('Delete this dare? This cannot be undone.')) return
+    const res = await fetch(`${API}/api/dares/${dare.id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+    if (res.ok) fetchBoard()
+  }
+
   const handleDareBack = (dare: Dare) => {
     // Pre-fill the dare form with the darer as target, then scroll to form
     setDareBackTarget(dare.darer_id)
@@ -330,6 +339,7 @@ export default function TripBoardPage() {
             onDareBack={handleDareBack}
             onShareStory={setShareStoryDare}
             onReveal={handleReveal}
+            onDelete={handleDelete}
           />
         ) : (
           <ProofGallery dares={dares} onProofClick={handleProofClick} />

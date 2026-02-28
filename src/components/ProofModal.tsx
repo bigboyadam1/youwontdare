@@ -34,16 +34,17 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
-      style={{ background: 'rgba(0,0,0,0.85)' }}
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50" style={{ background: 'rgba(0,0,0,0.85)' }} onClick={onClose}>
       <div
-        className="w-full max-w-md p-6 border border-[#555048] my-auto"
-        style={{ background: '#131313' }}
-        onClick={e => e.stopPropagation()}
+        className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+        onClick={onClose}
       >
+        <div
+          className="w-full max-w-md p-6 border border-[#555048] my-4 sm:my-auto flex-shrink-0"
+          style={{ background: '#131313' }}
+          onClick={e => e.stopPropagation()}
+        >
         <h3 className="font-[Anton] text-2xl text-[#00ff99] mb-1">PROVE IT</h3>
         <p className="font-[Courier_Prime] text-xs text-[#aaa49c] mb-4">
           upload your proof photo or video
@@ -113,6 +114,7 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
             cancel
           </button>
         </div>
+      </div>
       </div>
     </div>
   )

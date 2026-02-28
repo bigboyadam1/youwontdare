@@ -104,6 +104,15 @@ export default function PersonalBoardPage() {
     setLightboxImage({ url, caption })
   }
 
+  const handleDelete = async (dare: Dare) => {
+    if (!confirm('Delete this dare? This cannot be undone.')) return
+    const res = await fetch(`${API}/api/dares/${dare.id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    })
+    if (res.ok) fetchBoard()
+  }
+
   const handleReveal = async (dare: Dare) => {
     const res = await fetch(`${API}/api/dares/${dare.id}/reveal`, {
       method: 'POST',
@@ -143,12 +152,15 @@ export default function PersonalBoardPage() {
           </p>
         </div>
 
-        <DareForm
-          boardId={board.id}
-          boardType="personal"
-          currentUserId={user?.id ?? null}
-          onDareCreated={fetchBoard}
-        />
+        {/* Hide dare form when viewing your own board */}
+        {(!user || user.id !== board.owner_id) && (
+          <DareForm
+            boardId={board.id}
+            boardType="personal"
+            currentUserId={user?.id ?? null}
+            onDareCreated={fetchBoard}
+          />
+        )}
 
         {/* View toggle */}
         <div className="flex gap-2 mb-6">
@@ -188,6 +200,7 @@ export default function PersonalBoardPage() {
             onProofClick={handleProofClick}
             onShareStory={setShareStoryDare}
             onReveal={handleReveal}
+            onDelete={handleDelete}
           />
         ) : (
           <ProofGallery dares={dares} onProofClick={handleProofClick} />

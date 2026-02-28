@@ -210,6 +210,28 @@ router.post('/dares/:id/reveal', requireAuth, (req, res) => {
   res.json(updated);
 });
 
+// DELETE /api/dares/:id — delete dare (auth: must be darer_id)
+router.delete('/dares/:id', requireAuth, (req, res) => {
+  const { id } = req.params;
+
+  const dare = db.prepare('SELECT * FROM dares WHERE id = ?').get(id) as Record<string, unknown> | undefined;
+  if (!dare) {
+    res.status(404).json({ error: 'Dare not found' });
+    return;
+  }
+
+  if (dare.darer_id !== req.session.userId) {
+    res.status(403).json({ error: 'Only the dare creator can delete it' });
+    return;
+  }
+
+  db.prepare('DELETE FROM dare_reactions WHERE dare_id = ?').run(id);
+  db.prepare('DELETE FROM spice_votes WHERE dare_id = ?').run(id);
+  db.prepare('DELETE FROM dares WHERE id = ?').run(id);
+
+  res.json({ success: true });
+});
+
 // POST /api/dares/:id/react — toggle reaction (no auth required)
 router.post('/dares/:id/react', (req, res) => {
   const { id } = req.params;
