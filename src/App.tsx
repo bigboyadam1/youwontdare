@@ -12,6 +12,7 @@ import TripBoardPage from './pages/TripBoardPage'
 import CreateTripPage from './pages/CreateTripPage'
 import ProfilePage from './pages/ProfilePage'
 import MyBoardsPage from './pages/MyBoardsPage'
+import SharePreviewPage from './pages/SharePreviewPage'
 
 function App() {
   const { loading } = useAuth()
@@ -39,6 +40,7 @@ function App() {
         <Route path="/trip/:slug" element={<TripBoardPage />} />
         <Route path="/create-trip" element={<CreateTripPage />} />
         <Route path="/profile/:username" element={<ProfilePage />} />
+        <Route path="/dev/share-preview" element={<SharePreviewPage />} />
       </Routes>
     </div>
   )

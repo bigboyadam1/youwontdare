@@ -11,10 +11,13 @@ const ShareCard = forwardRef<HTMLDivElement, Props>(({ dare }, ref) => {
 
   // Attribution line
   const attribution = dare.darer_name && dare.dared_name
-    ? `from: ${dare.darer_name} → ${dare.dared_name}`
+    ? `${dare.darer_name} dared ${dare.dared_name}`
     : dare.darer_name
-      ? `dared by: ${dare.darer_name}`
+      ? `dared by ${dare.darer_name}`
       : null
+
+  const statusColor = isCompleted ? '#00ff99' : isChickened ? '#ff0055' : '#ffcc00'
+  const statusText = isCompleted ? 'DONE' : isChickened ? 'CHICKENED OUT' : 'PENDING'
 
   return (
     <div
@@ -29,34 +32,20 @@ const ShareCard = forwardRef<HTMLDivElement, Props>(({ dare }, ref) => {
         overflow: 'hidden',
       }}
     >
-      {/* Top bar */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '12px 16px',
-        }}
-      >
+      {/* Logo — exact match of Header: Anton, skewed, pink text-shadow */}
+      <div style={{ padding: '16px 16px 16px', textAlign: 'center' }}>
         <div
           style={{
             fontFamily: '"Anton", sans-serif',
-            color: '#ff0055',
-            fontSize: 16,
-            letterSpacing: 2,
+            fontSize: 24,
+            color: '#f0f0f0',
             textTransform: 'uppercase',
+            lineHeight: 1,
+            transform: 'skewY(-4deg)',
+            textShadow: '2px 2px #ff0055',
           }}
         >
-          YOUWONTDARE
-        </div>
-        <div
-          style={{
-            fontFamily: '"Anton", sans-serif',
-            fontSize: 20,
-            color: '#ff0055',
-          }}
-        >
-          🔥
+          YOU WON'T DARE
         </div>
       </div>
 
@@ -69,42 +58,29 @@ const ShareCard = forwardRef<HTMLDivElement, Props>(({ dare }, ref) => {
             crossOrigin="anonymous"
             style={{
               width: '100%',
-              height: 340,
+              height: 420,
               objectFit: 'cover',
               display: 'block',
               borderRadius: 4,
             }}
           />
-          {/* Stamp overlay on image */}
-          {(isCompleted || isChickened) && (
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: isChickened ? 'rgba(13,13,13,0.5)' : 'rgba(13,13,13,0.3)',
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: '"Anton", sans-serif',
-                  fontSize: 72,
-                  color: isCompleted ? '#00ff9940' : '#ff005540',
-                  transform: isCompleted ? 'rotate(-8deg)' : 'rotate(-12deg)',
-                  lineHeight: 1,
-                  textTransform: 'uppercase',
-                  textShadow: isCompleted
-                    ? '0 0 30px #00ff9920'
-                    : '0 0 30px #ff005520',
-                  userSelect: 'none',
-                }}
-              >
-                {isCompleted ? 'DONE' : 'CHICKEN'}
-              </div>
-            </div>
-          )}
+          {/* Small status badge — bottom-right corner of image */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 8,
+              right: 8,
+              fontFamily: '"Anton", sans-serif',
+              fontSize: 14,
+              color: statusColor,
+              background: 'rgba(13,13,13,0.8)',
+              padding: '4px 10px',
+              borderRadius: 2,
+              letterSpacing: 1,
+            }}
+          >
+            {statusText}
+          </div>
         </div>
       ) : (
         /* No proof: dare text centered as hero */
@@ -112,6 +88,7 @@ const ShareCard = forwardRef<HTMLDivElement, Props>(({ dare }, ref) => {
           style={{
             flex: 1,
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             padding: '0 24px',
@@ -131,35 +108,18 @@ const ShareCard = forwardRef<HTMLDivElement, Props>(({ dare }, ref) => {
           >
             {dare.text}
           </p>
-          {/* Stamp overlay for no-proof layout */}
-          {(isCompleted || isChickened) && (
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: '"Anton", sans-serif',
-                  fontSize: 72,
-                  color: isCompleted ? '#00ff9930' : '#ff005530',
-                  transform: isCompleted ? 'rotate(-8deg)' : 'rotate(-12deg)',
-                  lineHeight: 1,
-                  textTransform: 'uppercase',
-                  textShadow: isCompleted
-                    ? '0 0 30px #00ff9915'
-                    : '0 0 30px #ff005515',
-                  userSelect: 'none',
-                }}
-              >
-                {isCompleted ? 'DONE' : 'CHICKEN'}
-              </div>
-            </div>
-          )}
+          {/* Status below text when no image */}
+          <div
+            style={{
+              fontFamily: '"Anton", sans-serif',
+              fontSize: 16,
+              color: statusColor,
+              marginTop: 16,
+              letterSpacing: 2,
+            }}
+          >
+            {statusText}
+          </div>
         </div>
       )}
 
@@ -170,7 +130,7 @@ const ShareCard = forwardRef<HTMLDivElement, Props>(({ dare }, ref) => {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          padding: '16px 16px 0',
+          padding: '10px 16px 0',
         }}
       >
         {/* Dare text (only when proof image is shown) */}

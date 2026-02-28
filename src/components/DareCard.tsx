@@ -1,6 +1,4 @@
 import type { Dare } from '../types'
-import ReactionBar from './ReactionBar'
-import SpiceRating from './SpiceRating'
 import Countdown from './Countdown'
 
 interface Props {
@@ -214,22 +212,6 @@ export default function DareCard({ dare, index, isOwner, boardType, currentUserI
             )}
           </div>
 
-          {/* Reactions + Spice on completed dares */}
-          {isCompleted && (
-            <div className="flex flex-wrap items-center gap-3 mt-2 relative z-20">
-              <ReactionBar
-                dareId={dare.id}
-                fire={dare.react_fire || 0}
-                skull={dare.react_skull || 0}
-                crying={dare.react_crying || 0}
-              />
-              <SpiceRating
-                dareId={dare.id}
-                avg={dare.spice_avg ?? null}
-                count={dare.spice_count || 0}
-              />
-            </div>
-          )}
         </div>
 
         {/* Status badge — small label in corner */}
