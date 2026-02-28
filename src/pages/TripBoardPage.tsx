@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import type { Dare, Board as BoardType, BoardMember } from '../types'
 import DareForm from '../components/DareForm'
 import Board from '../components/Board'
-import StatsBar from '../components/StatsBar'
+
 import ProofModal from '../components/ProofModal'
 import Lightbox from '../components/Lightbox'
 import Confetti from '../components/Confetti'
@@ -249,11 +249,14 @@ export default function TripBoardPage() {
   const isOwner = user?.id === board.owner_id
 
   return (
-    <div className="min-h-screen pb-28">
+    <div className="min-h-screen pb-8">
       <div className="max-w-3xl mx-auto px-4 py-4">
         {/* Board title */}
         <div className="mb-6">
           <h2 className="font-[Anton] text-3xl text-[#f0f0f0]">{board.name}</h2>
+          <p className="font-[Courier_Prime] text-xs text-[#777]">
+            {dares.length} dare{dares.length !== 1 ? 's' : ''} · <span style={{ color: '#00ff99' }}>{completed} completed</span> · {members.length} member{members.length !== 1 ? 's' : ''}
+          </p>
           <p className="font-[Courier_Prime] text-sm text-[#aaa49c]">
             {members.length} traveler{members.length !== 1 ? 's' : ''} — dare each other
           </p>
@@ -345,8 +348,6 @@ export default function TripBoardPage() {
           <ProofGallery dares={dares} onProofClick={handleProofClick} />
         )}
       </div>
-
-      <StatsBar total={dares.length} completed={completed} enablers={members.length} enablersLabel="Members" />
 
       {proofModalDare && (
         <ProofModal

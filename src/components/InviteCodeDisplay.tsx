@@ -11,6 +11,7 @@ interface Props {
 export default function InviteCodeDisplay({ inviteCode, slug, isOwner, onRegenerate }: Props) {
   const [code, setCode] = useState(inviteCode)
   const [regenerating, setRegenerating] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const joinUrl = `${window.location.origin}/trip/${slug}?code=${code}`
@@ -50,7 +51,15 @@ export default function InviteCodeDisplay({ inviteCode, slug, isOwner, onRegener
   }
 
   return (
-    <div className="border border-[#555048] p-4 mb-6" style={{ background: '#131313' }}>
+    <div className="border border-[#555048] mb-6" style={{ background: '#131313' }}>
+      <div
+        onClick={() => setExpanded(!expanded)}
+        className="font-[Courier_Prime] text-sm px-4 py-3 cursor-pointer select-none"
+        style={{ color: '#aaa49c' }}
+      >
+        share / invite {expanded ? '\u25b4' : '\u25be'}
+      </div>
+      {expanded && <div className="px-4 pb-4">
       <div className="flex flex-wrap items-start gap-4">
         {/* QR Code */}
         <div className="flex flex-col items-center gap-2">
@@ -109,6 +118,7 @@ export default function InviteCodeDisplay({ inviteCode, slug, isOwner, onRegener
           </div>
         </div>
       </div>
+      </div>}
     </div>
   )
 }

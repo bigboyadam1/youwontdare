@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import type { Dare, Board as BoardType } from '../types'
 import DareForm from '../components/DareForm'
 import Board from '../components/Board'
-import StatsBar from '../components/StatsBar'
+
 import ProofModal from '../components/ProofModal'
 import Lightbox from '../components/Lightbox'
 import Confetti from '../components/Confetti'
@@ -142,11 +142,14 @@ export default function PersonalBoardPage() {
   const uniqueAuthors = new Set(dares.map(d => d.author)).size
 
   return (
-    <div className="min-h-screen pb-28">
+    <div className="min-h-screen pb-8">
       <div className="max-w-3xl mx-auto px-4 py-4">
         {/* Board title */}
         <div className="mb-8">
           <h2 className="font-[Anton] text-3xl text-[#f0f0f0]">{board.name}</h2>
+          <p className="font-[Courier_Prime] text-xs text-[#777]">
+            {dares.length} dare{dares.length !== 1 ? 's' : ''} · <span style={{ color: '#00ff99' }}>{completed} completed</span> · {uniqueAuthors} enabler{uniqueAuthors !== 1 ? 's' : ''}
+          </p>
           <p className="font-[Courier_Prime] text-sm text-[#aaa49c]">
             dare @{board.slug} — they won't do it.
           </p>
@@ -206,8 +209,6 @@ export default function PersonalBoardPage() {
           <ProofGallery dares={dares} onProofClick={handleProofClick} />
         )}
       </div>
-
-      <StatsBar total={dares.length} completed={completed} enablers={uniqueAuthors} />
 
       {proofModalDare && (
         <ProofModal
