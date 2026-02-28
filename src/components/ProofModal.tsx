@@ -35,12 +35,12 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
       style={{ background: 'rgba(0,0,0,0.85)' }}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md p-6 border border-[#555048]"
+        className="w-full max-w-md p-6 border border-[#555048] my-auto"
         style={{ background: '#131313' }}
         onClick={e => e.stopPropagation()}
       >
