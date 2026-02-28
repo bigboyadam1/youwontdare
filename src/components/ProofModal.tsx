@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type { Dare } from '../types'
 
 interface Props {
@@ -13,6 +13,24 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
   const [caption, setCaption] = useState('')
   const [dragging, setDragging] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  // Lock body scroll when modal is open (fixes iOS Safari scroll bleed-through)
+  useEffect(() => {
+    const scrollY = window.scrollY
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${scrollY}px`
+    document.body.style.left = '0'
+    document.body.style.right = '0'
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.left = ''
+      document.body.style.right = ''
+      document.body.style.overflow = ''
+      window.scrollTo(0, scrollY)
+    }
+  }, [])
 
   const handleFile = (file: File) => {
     setIsVideo(file.type.startsWith('video/'))
@@ -34,87 +52,88 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50" style={{ background: 'rgba(0,0,0,0.85)' }} onClick={onClose}>
-      <div
-        className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto"
-        style={{ WebkitOverflowScrolling: 'touch' }}
-        onClick={onClose}
-      >
+    <div
+      className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"
+      style={{ background: 'rgba(0,0,0,0.85)', WebkitOverflowScrolling: 'touch' }}
+      onTouchMove={e => e.stopPropagation()}
+      onClick={onClose}
+    >
+      <div className="min-h-full flex items-start sm:items-center justify-center p-4">
         <div
           className="w-full max-w-md p-6 border border-[#555048] my-4 sm:my-auto flex-shrink-0"
           style={{ background: '#131313' }}
           onClick={e => e.stopPropagation()}
         >
-        <h3 className="font-[Anton] text-2xl text-[#00ff99] mb-1">PROVE IT</h3>
-        <p className="font-[Courier_Prime] text-xs text-[#aaa49c] mb-4">
-          upload your proof photo or video
-        </p>
+          <h3 className="font-[Anton] text-2xl text-[#00ff99] mb-1">PROVE IT</h3>
+          <p className="font-[Courier_Prime] text-xs text-[#aaa49c] mb-4">
+            upload your proof photo or video
+          </p>
 
-        {/* Drop zone */}
-        <div
-          className="border-2 border-dashed p-8 text-center mb-4 cursor-pointer transition-colors"
-          style={{
-            borderColor: dragging ? '#00ff99' : '#555048',
-            background: dragging ? '#1c1c1c' : 'transparent',
-          }}
-          onDragOver={e => { e.preventDefault(); setDragging(true) }}
-          onDragLeave={() => setDragging(false)}
-          onDrop={handleDrop}
-          onClick={() => fileRef.current?.click()}
-        >
-          {mediaData ? (
-            isVideo ? (
-              <video src={mediaData} controls className="max-h-48 mx-auto" />
-            ) : (
-              <img src={mediaData} alt="proof preview" className="max-h-48 mx-auto" />
-            )
-          ) : (
-            <p className="font-[Courier_Prime] text-sm text-[#aaa49c]">
-              Drag & drop or tap to upload
-            </p>
-          )}
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*,video/*"
-            className="hidden"
-            onChange={e => {
-              const file = e.target.files?.[0]
-              if (file) handleFile(file)
+          {/* Drop zone */}
+          <div
+            className="border-2 border-dashed p-8 text-center mb-4 cursor-pointer transition-colors"
+            style={{
+              borderColor: dragging ? '#00ff99' : '#555048',
+              background: dragging ? '#1c1c1c' : 'transparent',
             }}
-          />
-        </div>
-
-        {/* Caption */}
-        <div className="mb-4">
-          <label className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c] block mb-1">
-            Caption
-          </label>
-          <input
-            className="dare-input font-[Courier_Prime] text-sm"
-            value={caption}
-            onChange={e => setCaption(e.target.value)}
-            placeholder="I actually did it..."
-          />
-        </div>
-
-        <div className="flex gap-3">
-          <button
-            onClick={handleSubmit}
-            disabled={!mediaData}
-            className="font-[Anton] text-lg px-6 py-2 border-none cursor-pointer disabled:opacity-40"
-            style={{ background: '#00ff99', color: '#0d0d0d' }}
+            onDragOver={e => { e.preventDefault(); setDragging(true) }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={handleDrop}
+            onClick={() => fileRef.current?.click()}
           >
-            SUBMIT PROOF
-          </button>
-          <button
-            onClick={onClose}
-            className="font-[Courier_Prime] text-sm text-[#aaa49c] hover:text-[#f0f0f0] cursor-pointer border-none bg-transparent"
-          >
-            cancel
-          </button>
+            {mediaData ? (
+              isVideo ? (
+                <video src={mediaData} controls className="max-h-48 mx-auto" />
+              ) : (
+                <img src={mediaData} alt="proof preview" className="max-h-48 mx-auto" />
+              )
+            ) : (
+              <p className="font-[Courier_Prime] text-sm text-[#aaa49c]">
+                Drag & drop or tap to upload
+              </p>
+            )}
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*,video/*"
+              className="hidden"
+              onChange={e => {
+                const file = e.target.files?.[0]
+                if (file) handleFile(file)
+              }}
+            />
+          </div>
+
+          {/* Caption */}
+          <div className="mb-4">
+            <label className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c] block mb-1">
+              Caption
+            </label>
+            <input
+              className="dare-input font-[Courier_Prime] text-sm"
+              value={caption}
+              onChange={e => setCaption(e.target.value)}
+              placeholder="I actually did it..."
+            />
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={handleSubmit}
+              disabled={!mediaData}
+              className="font-[Anton] text-lg px-6 py-2 border-none cursor-pointer disabled:opacity-40"
+              style={{ background: '#00ff99', color: '#0d0d0d' }}
+            >
+              SUBMIT PROOF
+            </button>
+            <button
+              onClick={onClose}
+              className="font-[Courier_Prime] text-sm text-[#aaa49c] hover:text-[#f0f0f0] cursor-pointer border-none bg-transparent"
+            >
+              cancel
+            </button>
+          </div>
         </div>
-      </div>
       </div>
     </div>
   )
