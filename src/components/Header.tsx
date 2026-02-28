@@ -37,7 +37,7 @@ export default function Header() {
                   className="px-2.5 py-1 no-underline transition-opacity hover:opacity-80"
                   style={{ background: '#00ccff', color: '#0d0d0d' }}
                 >
-                  + group
+                  create group
                 </Link>
                 <Link
                   to={`/profile/${user.username}`}

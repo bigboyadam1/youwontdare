@@ -54,28 +54,28 @@ export default function ProfilePage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-10">
-        <div className="border border-[#555048] p-4 text-center" style={{ background: '#131313' }}>
-          <div className="font-[Anton] text-3xl text-[#00ff99]">{stats.daresCompleted}</div>
-          <div className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c]">
+      <div className="grid grid-cols-4 gap-2 sm:gap-4 mb-10">
+        <div className="border border-[#555048] p-2 sm:p-4 text-center overflow-hidden" style={{ background: '#131313' }}>
+          <div className="font-[Anton] text-2xl sm:text-3xl text-[#00ff99]">{stats.daresCompleted}</div>
+          <div className="font-[Courier_Prime] text-[8px] sm:text-[10px] uppercase tracking-wider sm:tracking-widest text-[#aaa49c]">
             Completed
           </div>
         </div>
-        <div className="border border-[#555048] p-4 text-center" style={{ background: '#131313' }}>
-          <div className="font-[Anton] text-3xl text-[#ff0055]">{stats.daresGiven}</div>
-          <div className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c]">
+        <div className="border border-[#555048] p-2 sm:p-4 text-center overflow-hidden" style={{ background: '#131313' }}>
+          <div className="font-[Anton] text-2xl sm:text-3xl text-[#ff0055]">{stats.daresGiven}</div>
+          <div className="font-[Courier_Prime] text-[8px] sm:text-[10px] uppercase tracking-wider sm:tracking-widest text-[#aaa49c]">
             Given
           </div>
         </div>
-        <div className="border border-[#555048] p-4 text-center" style={{ background: '#131313' }}>
-          <div className="font-[Anton] text-3xl text-[#ffcc00]">{stats.completionRate}%</div>
-          <div className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c]">
+        <div className="border border-[#555048] p-2 sm:p-4 text-center overflow-hidden" style={{ background: '#131313' }}>
+          <div className="font-[Anton] text-2xl sm:text-3xl text-[#ffcc00]">{stats.completionRate}%</div>
+          <div className="font-[Courier_Prime] text-[8px] sm:text-[10px] uppercase tracking-wider sm:tracking-widest text-[#aaa49c]">
             Rate
           </div>
         </div>
-        <div className="border border-[#555048] p-4 text-center" style={{ background: '#131313' }}>
-          <div className="font-[Anton] text-3xl text-[#ff6600]">{stats.streak}</div>
-          <div className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c]">
+        <div className="border border-[#555048] p-2 sm:p-4 text-center overflow-hidden" style={{ background: '#131313' }}>
+          <div className="font-[Anton] text-2xl sm:text-3xl text-[#ff6600]">{stats.streak}</div>
+          <div className="font-[Courier_Prime] text-[8px] sm:text-[10px] uppercase tracking-wider sm:tracking-widest text-[#aaa49c]">
             Streak
           </div>
         </div>
