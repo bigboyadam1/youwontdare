@@ -13,20 +13,18 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
   const [caption, setCaption] = useState('')
   const [dragging, setDragging] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
 
-  // Lock body scroll when modal is open (fixes iOS Safari scroll bleed-through)
+  // Lock body scroll when modal is open
   useEffect(() => {
     const scrollY = window.scrollY
-    const html = document.documentElement
-    html.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
     document.body.style.overflow = 'hidden'
     document.body.style.position = 'fixed'
     document.body.style.top = `-${scrollY}px`
     document.body.style.left = '0'
     document.body.style.right = '0'
     return () => {
-      html.style.overflow = ''
+      document.documentElement.style.overflow = ''
       document.body.style.overflow = ''
       document.body.style.position = ''
       document.body.style.top = ''
@@ -57,22 +55,23 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
 
   return (
     <div
-      ref={scrollRef}
-      className="fixed inset-0 overflow-y-auto overscroll-none"
-      style={{
-        background: 'rgba(0,0,0,0.85)',
-        WebkitOverflowScrolling: 'touch',
-        zIndex: 9990,
-        touchAction: 'pan-y',
-      }}
-      onClick={onClose}
+      className="fixed inset-0"
+      style={{ zIndex: 9990, background: '#0d0d0d' }}
     >
-      <div className="min-h-full flex items-start sm:items-center justify-center p-4 pb-8">
-        <div
-          className="w-full max-w-md p-6 border border-[#555048] mt-4 mb-8 sm:my-auto flex-shrink-0"
-          style={{ background: '#131313', touchAction: 'manipulation' }}
-          onClick={e => e.stopPropagation()}
-        >
+      {/* Close button */}
+      <div
+        className="absolute top-4 right-4 font-[Anton] text-lg px-4 py-2 cursor-pointer select-none"
+        style={{ color: '#aaa49c', zIndex: 1 }}
+        onClick={onClose}
+      >
+        CLOSE ✕
+      </div>
+
+      <div
+        className="h-full overflow-y-auto"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
+        <div className="max-w-md mx-auto px-4 pt-14 pb-8">
           <h3 className="font-[Anton] text-2xl text-[#00ff99] mb-1">PROVE IT</h3>
           <p className="font-[Courier_Prime] text-xs text-[#aaa49c] mb-4">
             upload your proof photo or video
@@ -98,7 +97,7 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
               )
             ) : (
               <p className="font-[Courier_Prime] text-sm text-[#aaa49c]">
-                Drag & drop or tap to upload
+                Tap to upload photo or video
               </p>
             )}
             <input
@@ -114,7 +113,7 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
           </div>
 
           {/* Caption */}
-          <div className="mb-4">
+          <div className="mb-6">
             <label className="font-[Courier_Prime] text-[10px] uppercase tracking-widest text-[#aaa49c] block mb-1">
               Caption
             </label>
@@ -126,28 +125,25 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
             />
           </div>
 
-          <div className="flex gap-3">
-            <button
-              onPointerUp={e => { e.stopPropagation(); handleSubmit() }}
-              className="font-[Anton] text-lg px-6 py-3 border-none cursor-pointer"
-              style={{
-                background: '#00ff99',
-                color: '#0d0d0d',
-                opacity: mediaData ? 1 : 0.4,
-                touchAction: 'manipulation',
-                WebkitTapHighlightColor: 'transparent',
-                minHeight: 48,
-              }}
-            >
-              SUBMIT PROOF
-            </button>
-            <button
-              onPointerUp={e => { e.stopPropagation(); onClose() }}
-              className="font-[Courier_Prime] text-sm text-[#aaa49c] hover:text-[#f0f0f0] cursor-pointer border-none bg-transparent"
-              style={{ touchAction: 'manipulation', minHeight: 48 }}
-            >
-              cancel
-            </button>
+          {/* Submit — full width, big tap target */}
+          <div
+            onClick={handleSubmit}
+            role="button"
+            className="font-[Anton] text-xl text-center py-4 cursor-pointer select-none"
+            style={{
+              background: mediaData ? '#00ff99' : '#333',
+              color: mediaData ? '#0d0d0d' : '#666',
+            }}
+          >
+            SUBMIT PROOF
+          </div>
+
+          <div
+            onClick={onClose}
+            role="button"
+            className="font-[Courier_Prime] text-sm text-center text-[#aaa49c] mt-4 py-3 cursor-pointer select-none"
+          >
+            cancel
           </div>
         </div>
       </div>
