@@ -8,8 +8,8 @@ interface Props {
 export default function StatsBar({ total, completed, enablers, enablersLabel = 'Enablers' }: Props) {
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#555048] backdrop-blur-md"
-      style={{ background: 'rgba(19, 19, 19, 0.9)', boxShadow: '0 -8px 24px rgba(0, 0, 0, 0.5)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#555048]"
+      style={{ background: '#131313', boxShadow: '0 -8px 24px rgba(0, 0, 0, 0.5)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <div className="max-w-3xl mx-auto grid grid-cols-3 py-3 px-4 text-center">
         <div>
