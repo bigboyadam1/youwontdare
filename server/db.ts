@@ -55,7 +55,35 @@ db.exec(`
 `);
 
 // --- Migration: rename 'trip' board type to 'group' ---
-db.exec("UPDATE boards SET type = 'group' WHERE type = 'trip'");
+// SQLite CHECK constraints can't be altered, so we recreate the table
+// if the old constraint is still in place.
+const boardTableSql = db.prepare(
+  "SELECT sql FROM sqlite_master WHERE type='table' AND name='boards'"
+).get() as { sql: string } | undefined;
+
+if (boardTableSql && boardTableSql.sql.includes("'trip'")) {
+  db.exec(`
+    -- Update values while old constraint still allows 'trip'
+    -- (old CHECK allows both 'personal' and 'trip')
+    ALTER TABLE boards RENAME TO boards_old;
+    CREATE TABLE boards (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      owner_id INTEGER NOT NULL REFERENCES users(id),
+      type TEXT NOT NULL CHECK(type IN ('personal', 'group')),
+      name TEXT NOT NULL,
+      slug TEXT NOT NULL UNIQUE,
+      is_public INTEGER DEFAULT 1,
+      invite_code TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    INSERT INTO boards (id, owner_id, type, name, slug, is_public, invite_code, created_at)
+      SELECT id, owner_id,
+        CASE WHEN type = 'trip' THEN 'group' ELSE type END,
+        name, slug, is_public, invite_code, created_at
+      FROM boards_old;
+    DROP TABLE boards_old;
+  `);
+}
 
 // --- Migration: add columns to existing dares table if missing ---
 const columns = db.prepare("PRAGMA table_info(dares)").all() as { name: string }[];
