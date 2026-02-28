@@ -71,9 +71,11 @@ app.use(
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: 'lax' as const,
       secure: isProd,
-      domain: isProd ? '.youwontdare.xyz' : undefined,
+      // Omit domain so cookie is "host-only" (youwontdare.xyz exact match).
+      // Safari handles host-only cookies more reliably than domain cookies
+      // with a leading dot. www is already redirected to bare domain.
     },
   })
 );
