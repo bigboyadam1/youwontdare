@@ -7,7 +7,7 @@ export default function Header() {
   return (
     <header className="mb-8 pt-6 px-4">
       <div className="max-w-3xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-2">
+        <div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-3 mb-2">
           <Link to="/" className="no-underline">
             <h1
               className="font-[Anton] uppercase leading-none"
