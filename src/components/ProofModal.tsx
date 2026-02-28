@@ -13,21 +13,25 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
   const [caption, setCaption] = useState('')
   const [dragging, setDragging] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   // Lock body scroll when modal is open (fixes iOS Safari scroll bleed-through)
   useEffect(() => {
     const scrollY = window.scrollY
+    const html = document.documentElement
+    html.style.overflow = 'hidden'
+    document.body.style.overflow = 'hidden'
     document.body.style.position = 'fixed'
     document.body.style.top = `-${scrollY}px`
     document.body.style.left = '0'
     document.body.style.right = '0'
-    document.body.style.overflow = 'hidden'
     return () => {
+      html.style.overflow = ''
+      document.body.style.overflow = ''
       document.body.style.position = ''
       document.body.style.top = ''
       document.body.style.left = ''
       document.body.style.right = ''
-      document.body.style.overflow = ''
       window.scrollTo(0, scrollY)
     }
   }, [])
@@ -53,15 +57,20 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto overscroll-contain"
-      style={{ background: 'rgba(0,0,0,0.85)', WebkitOverflowScrolling: 'touch' }}
-      onTouchMove={e => e.stopPropagation()}
+      ref={scrollRef}
+      className="fixed inset-0 overflow-y-auto overscroll-none"
+      style={{
+        background: 'rgba(0,0,0,0.85)',
+        WebkitOverflowScrolling: 'touch',
+        zIndex: 9990,
+        touchAction: 'pan-y',
+      }}
       onClick={onClose}
     >
-      <div className="min-h-full flex items-start sm:items-center justify-center p-4">
+      <div className="min-h-full flex items-start sm:items-center justify-center p-4 pb-8">
         <div
-          className="w-full max-w-md p-6 border border-[#555048] my-4 sm:my-auto flex-shrink-0"
-          style={{ background: '#131313' }}
+          className="w-full max-w-md p-6 border border-[#555048] mt-4 mb-8 sm:my-auto flex-shrink-0"
+          style={{ background: '#131313', touchAction: 'manipulation' }}
           onClick={e => e.stopPropagation()}
         >
           <h3 className="font-[Anton] text-2xl text-[#00ff99] mb-1">PROVE IT</h3>
@@ -119,16 +128,23 @@ export default function ProofModal({ dare, onSubmit, onClose }: Props) {
 
           <div className="flex gap-3">
             <button
-              onClick={handleSubmit}
-              disabled={!mediaData}
-              className="font-[Anton] text-lg px-6 py-2 border-none cursor-pointer disabled:opacity-40"
-              style={{ background: '#00ff99', color: '#0d0d0d' }}
+              onPointerUp={e => { e.stopPropagation(); handleSubmit() }}
+              className="font-[Anton] text-lg px-6 py-3 border-none cursor-pointer"
+              style={{
+                background: '#00ff99',
+                color: '#0d0d0d',
+                opacity: mediaData ? 1 : 0.4,
+                touchAction: 'manipulation',
+                WebkitTapHighlightColor: 'transparent',
+                minHeight: 48,
+              }}
             >
               SUBMIT PROOF
             </button>
             <button
-              onClick={onClose}
+              onPointerUp={e => { e.stopPropagation(); onClose() }}
               className="font-[Courier_Prime] text-sm text-[#aaa49c] hover:text-[#f0f0f0] cursor-pointer border-none bg-transparent"
+              style={{ touchAction: 'manipulation', minHeight: 48 }}
             >
               cancel
             </button>
