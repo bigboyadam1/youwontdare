@@ -30,6 +30,7 @@ export default function MyBoardsPage() {
   const [joinError, setJoinError] = useState('')
   const [joining, setJoining] = useState(false)
   const [shareToast, setShareToast] = useState(false)
+  const [groupsExpanded, setGroupsExpanded] = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -151,7 +152,7 @@ export default function MyBoardsPage() {
       <p className="font-[Courier_Prime] text-sm text-[#aaa49c] mb-4">who's on board?</p>
       {groupBoards.length > 0 ? (
         <div className="flex flex-col gap-3 mb-8">
-          {groupBoards.map(board => (
+          {(groupBoards.length > 3 && !groupsExpanded ? groupBoards.slice(0, 3) : groupBoards).map(board => (
             <Link
               key={board.id}
               to={`/group/${board.slug}`}
@@ -187,6 +188,14 @@ export default function MyBoardsPage() {
               </div>
             </Link>
           ))}
+          {groupBoards.length > 3 && (
+            <button
+              onClick={() => setGroupsExpanded(!groupsExpanded)}
+              className="font-[Courier_Prime] text-xs text-[#aaa49c] hover:text-[#f0f0f0] transition-colors cursor-pointer border-none bg-transparent self-start"
+            >
+              {groupsExpanded ? `show less ▴` : `show all ${groupBoards.length} groups ▾`}
+            </button>
+          )}
         </div>
       ) : (
         <p className="font-[Courier_Prime] text-sm text-[#555048] mb-8">
