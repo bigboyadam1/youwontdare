@@ -161,21 +161,21 @@ export default function MyBoardsPage() {
                 className="p-5 border transition-colors hover:border-[#aaa49c]"
                 style={{ background: '#131313', borderColor: '#555048' }}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="font-[Anton] text-xl text-[#f0f0f0]">
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="font-[Anton] text-xl text-[#f0f0f0] truncate">
                       {board.name}
                     </span>
                     {board.owner_id === user.id && (
                       <span
-                        className="font-[Courier_Prime] text-[10px] uppercase px-2 py-0.5"
+                        className="font-[Courier_Prime] text-[10px] uppercase px-2 py-0.5 shrink-0"
                         style={{ background: '#ffcc00', color: '#0d0d0d' }}
                       >
                         owner
                       </span>
                     )}
                   </div>
-                  <span className="font-[Courier_Prime] text-xs text-[#aaa49c]">
+                  <span className="font-[Courier_Prime] text-xs text-[#aaa49c] shrink-0">
                     {board.dare_count} {board.dare_count === 1 ? 'dare' : 'dares'}
                   </span>
                 </div>

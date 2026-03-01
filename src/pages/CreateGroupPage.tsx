@@ -59,6 +59,7 @@ export default function CreateGroupPage() {
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="the lads"
+            maxLength={30}
             required
           />
         </div>

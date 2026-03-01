@@ -112,6 +112,11 @@ router.post('/group', requireAuth, (req, res) => {
     return;
   }
 
+  if (name.length > 30) {
+    res.status(400).json({ error: 'Name must be 30 characters or less' });
+    return;
+  }
+
   // Auto-generate slug from name + random suffix
   const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30);
   const suffix = crypto.randomBytes(3).toString('hex');
