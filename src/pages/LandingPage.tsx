@@ -4,8 +4,34 @@ import { useAuth } from '../context/AuthContext'
 export default function LandingPage() {
   const { user } = useAuth()
 
+  const chickens: { top: string; left?: string; right?: string; size: string; rotate: number; opacity: number }[] = [
+    { top: '5%', left: '8%', size: '2.5rem', rotate: -18, opacity: 0.15 },
+    { top: '12%', right: '6%', size: '1.8rem', rotate: 25, opacity: 0.12 },
+    { top: '38%', left: '3%', size: '1.4rem', rotate: -35, opacity: 0.1 },
+    { top: '55%', right: '4%', size: '2rem', rotate: 12, opacity: 0.13 },
+    { top: '75%', left: '10%', size: '1.6rem', rotate: 40, opacity: 0.11 },
+    { top: '82%', right: '12%', size: '1.2rem', rotate: -22, opacity: 0.1 },
+  ]
+
   return (
-    <div className="max-w-3xl mx-auto px-4 py-16 text-center">
+    <div className="max-w-3xl mx-auto px-4 py-16 text-center relative overflow-hidden">
+      {/* Scattered chickens */}
+      {chickens.map((c, i) => (
+        <span
+          key={i}
+          className="absolute select-none pointer-events-none"
+          style={{
+            top: c.top,
+            left: c.left,
+            right: c.right,
+            fontSize: c.size,
+            transform: `rotate(${c.rotate}deg)`,
+            opacity: c.opacity,
+          }}
+        >
+          🐔
+        </span>
+      ))}
       <h2
         className="font-[Anton] uppercase leading-none mb-4"
         style={{
