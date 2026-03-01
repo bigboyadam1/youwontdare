@@ -5,12 +5,16 @@ export default function LandingPage() {
   const { user } = useAuth()
 
   const chickens: { top: string; left?: string; right?: string; size: string; rotate: number; opacity: number }[] = [
-    { top: '5%', left: '8%', size: '2.5rem', rotate: -18, opacity: 0.15 },
-    { top: '12%', right: '6%', size: '1.8rem', rotate: 25, opacity: 0.12 },
-    { top: '38%', left: '3%', size: '1.4rem', rotate: -35, opacity: 0.1 },
-    { top: '55%', right: '4%', size: '2rem', rotate: 12, opacity: 0.13 },
-    { top: '75%', left: '10%', size: '1.6rem', rotate: 40, opacity: 0.11 },
-    { top: '82%', right: '12%', size: '1.2rem', rotate: -22, opacity: 0.1 },
+    { top: '2%', left: '5%', size: '3.5rem', rotate: -18, opacity: 0.35 },
+    { top: '8%', right: '8%', size: '2.8rem', rotate: 30, opacity: 0.3 },
+    { top: '22%', left: '2%', size: '2.2rem', rotate: -40, opacity: 0.25 },
+    { top: '30%', right: '3%', size: '3rem', rotate: 15, opacity: 0.3 },
+    { top: '48%', left: '6%', size: '2.5rem', rotate: 35, opacity: 0.28 },
+    { top: '55%', right: '5%', size: '2rem', rotate: -25, opacity: 0.25 },
+    { top: '68%', left: '3%', size: '3.2rem', rotate: 20, opacity: 0.32 },
+    { top: '72%', right: '10%', size: '2.4rem', rotate: -30, opacity: 0.27 },
+    { top: '88%', left: '12%', size: '2rem', rotate: 45, opacity: 0.3 },
+    { top: '92%', right: '6%', size: '2.8rem', rotate: -12, opacity: 0.25 },
   ]
 
   return (
