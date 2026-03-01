@@ -59,7 +59,7 @@ export default function LandingPage() {
         <div className="border border-[#555048] p-5" style={{ background: '#131313' }}>
           <div className="font-[Anton] text-lg text-[#ff0055] mb-2">PERSONAL BOARD</div>
           <p className="font-[Courier_Prime] text-xs text-[#aaa49c]">
-            Your board. Your link. Anyone with the link can dare you. No signup, no excuses.
+            Your board. Your link. Share it. Wait for the worst.
           </p>
         </div>
         <div className="border border-[#555048] p-5" style={{ background: '#131313' }}>
