@@ -90,7 +90,7 @@ export default function LandingPage() {
             {animatedCount.toLocaleString()}
           </div>
           <div className="font-[Courier_Prime] text-xs text-[#aaa49c] mt-1">
-            dares completed
+            dares done
           </div>
         </div>
       )}
