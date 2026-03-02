@@ -1,8 +1,42 @@
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
+function useAnimatedCounter(target: number, duration = 1200) {
+  const [value, setValue] = useState(0)
+  const rafRef = useRef<number>()
+
+  useEffect(() => {
+    if (target <= 0) return
+    const start = performance.now()
+    const animate = (now: number) => {
+      const elapsed = now - start
+      const progress = Math.min(elapsed / duration, 1)
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setValue(Math.round(eased * target))
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(animate)
+      }
+    }
+    rafRef.current = requestAnimationFrame(animate)
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
+  }, [target, duration])
+
+  return value
+}
+
 export default function LandingPage() {
   const { user } = useAuth()
+  const [completedCount, setCompletedCount] = useState(0)
+  const animatedCount = useAnimatedCounter(completedCount)
+
+  useEffect(() => {
+    fetch('/api/stats')
+      .then(r => r.json())
+      .then(data => setCompletedCount(data.completed))
+      .catch(() => {})
+  }, [])
 
   const chickens: { top: string; left?: string; right?: string; size: string; rotate: number; opacity: number }[] = [
     { top: '2%', left: '5%', size: '3.5rem', rotate: -18, opacity: 0.35 },
@@ -46,9 +80,20 @@ export default function LandingPage() {
         DARE YOUR FRIENDS.<br />
         <span style={{ color: '#ff0055' }}>PROVE IT.</span>
       </h2>
-      <p className="font-[Courier_Prime] text-sm text-[#aaa49c] mb-12">
+      <p className="font-[Courier_Prime] text-sm text-[#aaa49c] mb-8">
         a public record of things you probably shouldn't do.
       </p>
+
+      {completedCount > 0 && (
+        <div className="mb-10">
+          <div className="font-[Anton] leading-none" style={{ fontSize: 'clamp(2rem, 6vw, 3.5rem)', color: '#ff0055' }}>
+            {animatedCount.toLocaleString()}
+          </div>
+          <div className="font-[Courier_Prime] text-xs text-[#aaa49c] mt-1">
+            dares completed
+          </div>
+        </div>
+      )}
 
       {user ? (
         <div className="flex flex-col items-center gap-4">

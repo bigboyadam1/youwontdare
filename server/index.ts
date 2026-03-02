@@ -12,6 +12,7 @@ import dareRoutes from './routes/dares.js';
 import profileRoutes from './routes/profile.js';
 import notificationRoutes from './routes/notifications.js';
 import blogRoutes from './routes/blog.js';
+import statsRoutes from './routes/stats.js';
 import { posts as blogPosts } from './blog/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -88,6 +89,7 @@ app.use('/api/boards', boardRoutes);
 app.use('/api', dareRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/stats', statsRoutes);
 
 // --- Serve static files in production ---
 const distPath = path.join(__dirname, '..', 'dist');
