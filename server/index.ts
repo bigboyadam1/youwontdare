@@ -11,6 +11,8 @@ import boardRoutes from './routes/boards.js';
 import dareRoutes from './routes/dares.js';
 import profileRoutes from './routes/profile.js';
 import notificationRoutes from './routes/notifications.js';
+import blogRoutes from './routes/blog.js';
+import { posts as blogPosts } from './blog/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -92,7 +94,7 @@ const distPath = path.join(__dirname, '..', 'dist');
 app.use(express.static(distPath));
 
 // --- Dynamic OG meta tags for board/trip pages ---
-function injectOgTags(htmlPath: string, title: string, description: string): string {
+function injectOgTags(htmlPath: string, title: string, description: string, canonicalUrl?: string): string {
   try {
     let html = fs.readFileSync(htmlPath, 'utf-8');
     html = html.replace(/<meta property="og:title" content="[^"]*"/, `<meta property="og:title" content="${title}"`);
@@ -100,6 +102,9 @@ function injectOgTags(htmlPath: string, title: string, description: string): str
     html = html.replace(/<meta name="twitter:title" content="[^"]*"/, `<meta name="twitter:title" content="${title}"`);
     html = html.replace(/<meta name="twitter:description" content="[^"]*"/, `<meta name="twitter:description" content="${description}"`);
     html = html.replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`);
+    if (canonicalUrl) {
+      html = html.replace(/<link rel="canonical" href="[^"]*"/, `<link rel="canonical" href="${canonicalUrl}"`);
+    }
     return html;
   } catch {
     return '';
@@ -113,7 +118,8 @@ app.get('/board/:username', (req, res) => {
   ).get(req.params.username) as { name: string; display_name: string } | undefined;
 
   if (board) {
-    const html = injectOgTags(indexPath, `${board.display_name}'s Dare Board`, `Dare ${board.display_name} — they won't do it. YouWontDare`);
+    const canonical = `https://youwontdare.xyz/board/${req.params.username}`;
+    const html = injectOgTags(indexPath, `${board.display_name}'s Dare Board`, `Dare ${board.display_name} — they won't do it. YouWontDare`, canonical);
     if (html) { res.send(html); return; }
   }
   res.sendFile(indexPath);
@@ -126,10 +132,44 @@ app.get('/group/:slug', (req, res) => {
   ).get(req.params.slug) as { name: string } | undefined;
 
   if (board) {
-    const html = injectOgTags(indexPath, `${board.name} — YouWontDare Group`, `Join the group and dare each other. YouWontDare`);
+    const canonical = `https://youwontdare.xyz/group/${req.params.slug}`;
+    const html = injectOgTags(indexPath, `${board.name} — YouWontDare Group`, `Join the group and dare each other. YouWontDare`, canonical);
     if (html) { res.send(html); return; }
   }
   res.sendFile(indexPath);
+});
+
+// --- Blog ---
+app.use('/blog', blogRoutes);
+
+// --- Sitemap ---
+app.get('/sitemap.xml', (_req, res) => {
+  const staticPages = [
+    '',
+    '/blog',
+    ...blogPosts.map(p => `/blog/${p.slug}`),
+  ];
+
+  const personalBoards = db.prepare(
+    "SELECT slug FROM boards WHERE type = 'personal' AND is_public = 1"
+  ).all() as { slug: string }[];
+
+  const groupBoards = db.prepare(
+    "SELECT slug FROM boards WHERE type = 'group' AND is_public = 1"
+  ).all() as { slug: string }[];
+
+  const urls = [
+    ...staticPages.map(p => `  <url><loc>https://youwontdare.xyz${p}</loc></url>`),
+    ...personalBoards.map(b => `  <url><loc>https://youwontdare.xyz/board/${b.slug}</loc></url>`),
+    ...groupBoards.map(b => `  <url><loc>https://youwontdare.xyz/group/${b.slug}</loc></url>`),
+  ];
+
+  res.type('application/xml').send(
+`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.join('\n')}
+</urlset>`
+  );
 });
 
 // SPA fallback — serve index.html for all non-API routes

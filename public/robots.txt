@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /api/
+Disallow: /login
+Disallow: /signup
+Disallow: /onboarding
+Disallow: /my-boards
+Disallow: /create-group
+Disallow: /dev/
+
+Sitemap: https://youwontdare.xyz/sitemap.xml
