@@ -11,6 +11,12 @@ export default defineConfig({
       registerType: 'autoUpdate',
       workbox: {
         navigateFallbackDenylist: [/^\/api\//, /^\/blog/, /^\/sitemap\.xml/],
+        runtimeCaching: [
+          {
+            urlPattern: /^\/api\//,
+            handler: 'NetworkOnly',
+          },
+        ],
       },
       manifest: {
         name: "YOU WON'T DARE",
