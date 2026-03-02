@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 
 function useAnimatedCounter(target: number, duration = 1200) {
   const [value, setValue] = useState(0)
-  const rafRef = useRef<number>()
+  const rafRef = useRef<number>(undefined)
 
   useEffect(() => {
     if (target <= 0) return
