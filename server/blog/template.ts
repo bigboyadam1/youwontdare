@@ -34,7 +34,8 @@ function sharedHead(title: string, description: string, canonicalPath: string, e
       a { color: #facc15; text-decoration: none; }
       a:hover { text-decoration: underline; }
       .site-header { padding: 1.5rem 2rem; border-bottom: 1px solid #222; }
-      .site-header a { font-family: 'Anton', sans-serif; font-size: 1.25rem; color: #facc15; letter-spacing: 0.05em; text-transform: uppercase; }
+      .site-header a { font-family: 'Anton', sans-serif; font-size: clamp(1.5rem, 4vw, 2.2rem); color: #f0f0f0; letter-spacing: 0.05em; text-transform: uppercase; text-shadow: 3px 3px #ff0055; transform: skewY(-4deg); display: inline-block; text-decoration: none; }
+      .site-header a:hover { text-decoration: none; opacity: 0.85; }
       .site-footer { padding: 2rem; border-top: 1px solid #222; text-align: center; color: #666; font-size: 0.85rem; margin-top: 3rem; }
       .container { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; }
       h1 { font-family: 'Anton', sans-serif; font-size: clamp(2rem, 5vw, 3rem); color: #facc15; text-transform: uppercase; line-height: 1.2; margin-bottom: 1rem; }
@@ -123,7 +124,6 @@ export function renderBlogIndex(posts: BlogPost[]): string {
 <body>
   ${header()}
   <main class="container">
-    <h1>BLOG</h1>
     <ul class="post-list">${items}</ul>
   </main>
   ${footer()}

@@ -105,6 +105,10 @@ export default function LandingPage() {
           </p>
         </div>
       </div>
+
+      <div className="mt-20 font-[Courier_Prime] text-xs text-[#555048]">
+        <a href="/blog" className="text-[#555048] hover:text-[#aaa49c] transition-colors no-underline">blog</a>
+      </div>
     </div>
   )
 }
