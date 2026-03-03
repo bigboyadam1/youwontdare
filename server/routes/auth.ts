@@ -152,16 +152,6 @@ router.get('/google', (req, res) => {
   res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
 });
 
-// GET /api/auth/google/debug — check OAuth config (temporary)
-router.get('/google/debug', (_req, res) => {
-  res.json({
-    hasClientId: !!GOOGLE_CLIENT_ID,
-    hasClientSecret: !!GOOGLE_CLIENT_SECRET,
-    redirectUri: GOOGLE_REDIRECT_URI,
-    frontendUrl: FRONTEND_URL,
-  });
-});
-
 // GET /api/auth/google/callback — exchange code for tokens, find/create user
 router.get('/google/callback', async (req, res) => {
   const { code, state } = req.query;

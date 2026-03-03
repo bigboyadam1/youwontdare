@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import session from 'express-session';
 import BetterSqlite3SessionStore from 'better-sqlite3-session-store';
 import path from 'path';
@@ -23,6 +25,18 @@ const isProd = process.env.NODE_ENV === 'production';
 // Trust proxy in production (Railway sits behind a reverse proxy)
 if (isProd) {
   app.set('trust proxy', 1);
+}
+
+// --- Security headers ---
+app.use(helmet({
+  contentSecurityPolicy: false, // CSP handled by Vite/meta tags
+  crossOriginEmbedderPolicy: false, // Allow embedding images from Supabase
+}));
+
+// --- Session secret guard ---
+if (isProd && !process.env.SESSION_SECRET) {
+  console.error('FATAL: SESSION_SECRET environment variable is not set in production');
+  process.exit(1);
 }
 
 // Redirect www to non-www
@@ -83,6 +97,26 @@ app.use(
   })
 );
 
+// --- Rate limiting ---
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 15, // 15 attempts per window
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many attempts, please try again later' },
+});
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/signup', authLimiter);
+
+const apiLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100, // 100 requests per minute
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please slow down' },
+});
+app.use('/api', apiLimiter);
+
 // --- API Routes ---
 app.use('/api/auth', authRoutes);
 app.use('/api/boards', boardRoutes);
@@ -96,14 +130,20 @@ const distPath = path.join(__dirname, '..', 'dist');
 app.use(express.static(distPath));
 
 // --- Dynamic OG meta tags for board/trip pages ---
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 function injectOgTags(htmlPath: string, title: string, description: string, canonicalUrl?: string): string {
   try {
+    const safeTitle = escapeHtml(title);
+    const safeDesc = escapeHtml(description);
     let html = fs.readFileSync(htmlPath, 'utf-8');
-    html = html.replace(/<meta property="og:title" content="[^"]*"/, `<meta property="og:title" content="${title}"`);
-    html = html.replace(/<meta property="og:description" content="[^"]*"/, `<meta property="og:description" content="${description}"`);
-    html = html.replace(/<meta name="twitter:title" content="[^"]*"/, `<meta name="twitter:title" content="${title}"`);
-    html = html.replace(/<meta name="twitter:description" content="[^"]*"/, `<meta name="twitter:description" content="${description}"`);
-    html = html.replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`);
+    html = html.replace(/<meta property="og:title" content="[^"]*"/, `<meta property="og:title" content="${safeTitle}"`);
+    html = html.replace(/<meta property="og:description" content="[^"]*"/, `<meta property="og:description" content="${safeDesc}"`);
+    html = html.replace(/<meta name="twitter:title" content="[^"]*"/, `<meta name="twitter:title" content="${safeTitle}"`);
+    html = html.replace(/<meta name="twitter:description" content="[^"]*"/, `<meta name="twitter:description" content="${safeDesc}"`);
+    html = html.replace(/<title>[^<]*<\/title>/, `<title>${safeTitle}</title>`);
     if (canonicalUrl) {
       html = html.replace(/<link rel="canonical" href="[^"]*"/, `<link rel="canonical" href="${canonicalUrl}"`);
     }
