@@ -3,6 +3,7 @@ import { useAuth } from './context/AuthContext'
 import Header from './components/Header'
 import Toast from './components/Toast'
 import NotificationPrompt from './components/NotificationPrompt'
+import InstallPrompt from './components/InstallPrompt'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
@@ -30,6 +31,7 @@ function App() {
       <Header />
       <Toast />
       <NotificationPrompt />
+      <InstallPrompt />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
