@@ -1,0 +1,55 @@
+# YouWontDare
+
+> Dare your friends to do wild things and make them prove it — or chicken out.
+
+YouWontDare is a free group dare app at https://youwontdare.xyz. Users create dare boards, challenge friends, and upload photo/video proof of completion.
+
+## What it does
+
+- Personal dare boards: share your link and let anyone dare you
+- Group dare boards: everyone dares each other with leaderboards and badges
+- Proof system: upload photos or videos to prove you completed a dare
+- Chicken out: publicly admit defeat if you can't do it
+- Anonymous dares with optional reveal
+- Hype system, emoji reactions, and spice ratings
+- Push notifications when you get dared
+- Installable as a mobile app (PWA)
+
+## Use cases
+
+- Stag dos / bachelor parties
+- Hen parties / bachelorette weekends
+- Frat weekends and sorority events
+- Freshers week / orientation week
+- Work socials and team building
+- Friend group challenges
+- Holiday and travel dares
+- Birthday party games
+- Festival and concert dares
+- Sports team initiations and bonding
+
+## How it works
+
+1. Sign up free at https://youwontdare.xyz
+2. Create a personal board or a group board
+3. Share the link with friends
+4. Submit dares for each other
+5. Complete dares by uploading proof (photo/video)
+6. Track who's fearless and who's a chicken on the leaderboard
+
+## Key features
+
+- Free to use, no ads
+- Works on any device (phone, tablet, desktop)
+- Installable as a native-feeling app
+- Dark themed UI with party/arcade aesthetic
+- Sound effects (airhorn on completion, chicken sound on chicken out)
+- Confetti animations on dare completion
+- Sharable proof cards for social media
+- Deadline countdowns on dares
+- QR codes for easy board sharing
+
+## Links
+
+- Website: https://youwontdare.xyz
+- Twitter/X: https://x.com/youwontdareapp
